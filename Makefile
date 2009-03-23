@@ -1,7 +1,12 @@
+# include the project specific settings
+include project.mk
+
+# set the path to the build directory to include the build system
 build_dir := .
 include $(build_dir)/build.mk
 
 # Makefile command line args go here
+
 
 CXXFLAGS += -g -Wall -pedantic
 
@@ -37,8 +42,8 @@ programs: $(cxxprograms)
 plugins: $(plugins)
 
 clean:
-	rm -f $(shell find -name *.$(cxxprog_obj) -o \
-                           -name *.$(cxxsharedlib_obj) -o \
+	rm -f $(shell find -name *.$(cxx_prog_obj) -o \
+                           -name *.$(cxx_sharedlib_obj) -o \
                            -name '*.d' -o \
                            -name '*~' -o \
                            -name 'semantic.cache' -o \

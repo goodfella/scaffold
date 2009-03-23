@@ -5,7 +5,6 @@ compiled
 	targets
 		shared libraries
 		programs
-		object files
 
 	sources
 
@@ -29,7 +28,8 @@ ln_dest: link destination of object
 
 Compiled attributes: attributes that apply to all compiled objects
 
-ccflags: flags to give to the compiler
+cflags: flags to give to the C compiler
+cxxflags: flags to give to the C++ compiler
 cppflags: flags to give to the preprocessor
 incdirs:  -I directories
 
@@ -38,11 +38,10 @@ Target attributes: attributes that apply to target objects
 
 prelibs: libraries to build before building the target
 ldflags: flags to give to the linker
-link_opts: -Wl, linker options
+linkopts: -Wl, linker options
 libdirs:  -L directories
 libs: -l libraries
 srcs: sources used to compile object
-install_dirs: directories to install the target into
 
 
 shared library attributes: attributes that apply to shared libraries
@@ -58,4 +57,4 @@ typical make variables, i.e. CFLAGS, LDFLAGS ect plus the following:
 
 include_dirs: directories to include for all objects
 bin_dirs: directories to put binaries in
-lib_dirs: directories to put librarys in
+library_dirs: directories to put librarys in

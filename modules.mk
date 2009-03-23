@@ -31,7 +31,7 @@ $(call change_ext,$1,$2)
 endef
 
 
-# creates the src_cxxflags for the sources
+# creates the src_cxxflags for the sources of the target
 
 # 1 = target
 define create_src_cxxflags
@@ -60,7 +60,7 @@ endef
 # processes a module.mk file
 define process_module
 
-# process all the programs defined in the module
+# create the rules for the programs defined in the module
 $(foreach prog,$(local_cxxprogs),$(eval $(call cxxprog_rule,$(prog))))
 
 sources += $(call relpath,$(local_src))
@@ -91,7 +91,7 @@ $(call create_src_cxxflags,$1)
 # rule to create the program.  The dependencies are the object files
 # obtained from the source files as well as the prelibs specified in
 # the module.mk
-$(call relpath,$1): $(call create_obj_depends,$1,$(cxxprog_obj)) \
+$(call relpath,$1): $(call create_obj_depends,$1,$(cxx_prog_obj)) \
                     $(call create_prelib_depends,$1)
 
 	$(call gxx,$(CXXFLAGS) \
@@ -106,5 +106,5 @@ $(call relpath,$1): $(call create_obj_depends,$1,$(cxxprog_obj)) \
                    $(call ldflags,$1) \
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(call prelibs,$1)), \
-                   $$@,$$(filter %.$(cxxprog_obj),$$^))
+                   $$@,$$(filter %.$(cxx_prog_obj),$$^))
 endef

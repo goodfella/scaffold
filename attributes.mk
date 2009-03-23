@@ -1,5 +1,30 @@
-# defines for attributes, unless otherwise noted, the first argument
-# to the function is the name of the object
+# defines for attributes for the different types of objects.  Objects
+# are what the build system acts on.  The object hierarchy is as
+# follows (super objects are at the far left):
+
+#compiled
+#	targets
+#		shared libraries
+#		programs
+
+#	sources
+
+#not compiled
+
+#	files
+
+
+# attributes are inherited, so the valid attributes for a shared
+# library are the target attributes and the compiled object
+# attributes.  you specify attributes on an object in a module.mk file
+# by creating a variable whose name is the object name as given in the
+# module.mk file followed by a underscore '_' and the attribute name.
+# The value of the variable is the value of the attribute for that
+# object
+
+
+# unless otherwise noted, the first argument to the function is the
+# name of the object
 
 
 # this enables us to put commas in variables
@@ -11,7 +36,7 @@ define attribute
 $($(1)_$(2))
 endef
 
-# global attributes
+# global attributes apply to all objects
 
 # places to copy the object to
 define cp_dest
