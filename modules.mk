@@ -96,6 +96,7 @@ $(call relpath,$1): $(call create_obj_depends,$1,$(cxx_prog_obj)) \
 
 	$(call gxx,$(CXXFLAGS) \
                    $(CPPFLAGS) \
+                   $(LDFLAGS) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call lib_dirs,$(library_dirs)) \
                    $(call cxxflags,$1) \
