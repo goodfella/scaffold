@@ -38,7 +38,7 @@ endef
 # 2 = attribute
 # 3 = attribute values
 define create_src_var
-$(foreach src,$1,$(eval $(call relpath,$(src))_$(2)+=$3))
+$(foreach src,$1,$(if $3,$(eval $(call relpath,$(src))_$(2)+=$3)))
 endef
 
 
@@ -66,7 +66,7 @@ $(foreach prog,$(local_cxxprogs),$(eval $(call cxxprog_rule,$(prog))))
 
 
 # creates variables for source attributes
-$(foreach src,$(local_srcs),$(eval $(call src_attrs,$(src))))
+$(foreach src,$(local_srcs),$(eval $(call src_vars,$(src))))
 
 
 sources += $(call relpath,$(local_srcs))
@@ -114,13 +114,26 @@ $(call relpath,$1): $(call create_obj_depends,$1) \
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(call prelibs,$1)), \
                    $$@,$$(filter %.o,$$^))
+
+	$(if $(bin_dir),\
+             $(foreach dir,$(bin_dir),$(call cp,$(call relpath,$1),$(dir))))
+
+	$(if $(call cp_dest, $1),\
+             $(foreach dest,$(call cp_dest,$1),\
+                       $(call cp,$(call relpath,$1),$(dest))))
 endef
 
 
-# creates the variables for each source attribute
+# handles local_srcs in a module.mk
 
 # 1 = source file name
-define src_attrs
+define src_vars
+
+# create a variable for each source attribute
 $(call create_src_var,$1,cxxflags,$(call cxxflags,$1))
 $(call create_src_var,$1,cppflags,$(call cppflags,$1))
+$(call create_src_var,$1,cp_dest,$(call cp_dest,$1))
+
+# copy the source file
+
 endef

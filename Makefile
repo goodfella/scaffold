@@ -31,15 +31,18 @@ dependencies := $(shell find -name '*.d')
 
 modules := $(shell find -name 'module.mk')
 
-.PHONY: all clean line-count docs plugin-make plugin module.mk plugins etags
+.PHONY: all clean line-count docs plugin-make plugin module.mk plugins etags sources
 
-all: libraries programs
+all: libraries programs sources
 
 include $(modules)
 
 libraries: $(shared_libraries)
 programs: $(cxxprograms)
 plugins: $(plugins)
+sources:
+	$(foreach src,$(sources),\
+                  $(if $(src)_cp_dest,$(call cp,$(src),$($(src)_cp_dest))))
 
 clean:
 	rm -f $(shell find -name *.o -o \

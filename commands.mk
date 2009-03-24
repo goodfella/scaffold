@@ -59,4 +59,16 @@ endef
 define gxx
 $(call abbrv_cmd,$0,$(2))
 	$(Q)$(CXX) $(1) -o $2 $3
+
+endef
+
+
+# copies a list of files to a directory
+# 1 = list of files to copy
+# 2 = destination
+define cp
+$(call abbrv_cmd,$0,$1 "->" $2)
+	@mkdir -p $2
+	$(Q)cp -t $2 $1
+
 endef
