@@ -15,7 +15,7 @@ endef
 
 # converts the extension of a file
 
-# 1 = file
+# 1 = files
 # 2 = new extension
 define change_ext
 $(foreach src,$1,$(patsubst %$(suffix $(src)),%.$2,$(src)))
@@ -31,12 +31,14 @@ $(call change_ext,$1,$2)
 endef
 
 
-# creates the src_cxxflags for the sources of the target
+# creates the variable that stores the value of a attribute for a list
+# of sources
 
-# 1 = target
-define create_src_cxxflags
-$(foreach src,$(call srcs,$1),
-              $(eval $(call relpath,$(src))_cxxflags+=$(call src_cxxflags,$1)))
+# 1 = list of sources
+# 2 = attribute
+# 3 = attribute values
+define create_src_var
+$(foreach src,$1,$(eval $(call relpath,$(src))_$(2)+=$3))
 endef
 
 
@@ -51,9 +53,8 @@ endef
 # generates the object depends string
 
 # 1 = target
-# 2 = object file suffix
 define create_obj_depends
-$(call relpath,$(call src_obj,$(call srcs,$1),$2))
+$(call relpath,$(call src_obj,$(call srcs,$1),o))
 endef
 
 
@@ -63,16 +64,21 @@ define process_module
 # create the rules for the programs defined in the module
 $(foreach prog,$(local_cxxprogs),$(eval $(call cxxprog_rule,$(prog))))
 
-sources += $(call relpath,$(local_src))
+
+# creates variables for source attributes
+$(foreach src,$(local_srcs),$(eval $(call src_attrs,$(src))))
+
+
+sources += $(call relpath,$(local_srcs))
 cxxprograms += $(call relpath,$(local_cxxprogs))
-shared_libraries += $(call relpath,$(local_shared_lib))
-plugins += $(call relpath,$(local_plug))
+shared_libraries += $(call relpath,$(local_shared_libs))
+plugins += $(call relpath,$(local_plugs))
 
 # reset module variables
 local_cxxprogs :=
-local_shared_lib :=
-local_src :=
-local_plug :=
+local_shared_libs :=
+local_srcs :=
+local_plugs :=
 
 endef
 
@@ -86,12 +92,12 @@ define cxxprog_rule
 $(if $(call srcs,$1),,$(error program $(1) is missing a $(1)_srcs variable))
 
 # sets the src files cxxflags
-$(call create_src_cxxflags,$1)
+$(call create_src_var,$(call srcs,$1),cxxflags,$(call src_cxxflags,$1))
 
 # rule to create the program.  The dependencies are the object files
 # obtained from the source files as well as the prelibs specified in
 # the module.mk
-$(call relpath,$1): $(call create_obj_depends,$1,$(cxx_prog_obj)) \
+$(call relpath,$1): $(call create_obj_depends,$1) \
                     $(call create_prelib_depends,$1)
 
 	$(call gxx,$(CXXFLAGS) \
@@ -107,5 +113,14 @@ $(call relpath,$1): $(call create_obj_depends,$1,$(cxx_prog_obj)) \
                    $(call ldflags,$1) \
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(call prelibs,$1)), \
-                   $$@,$$(filter %.$(cxx_prog_obj),$$^))
+                   $$@,$$(filter %.o,$$^))
+endef
+
+
+# creates the variables for each source attribute
+
+# 1 = source file name
+define src_attrs
+$(call create_src_var,$1,cxxflags,$(call cxxflags,$1))
+$(call create_src_var,$1,cppflags,$(call cppflags,$1))
 endef

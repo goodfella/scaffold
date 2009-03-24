@@ -42,8 +42,8 @@ programs: $(cxxprograms)
 plugins: $(plugins)
 
 clean:
-	rm -f $(shell find -name *.$(cxx_prog_obj) -o \
-                           -name *.$(cxx_sharedlib_obj) -o \
+	rm -f $(shell find -name *.o -o \
+                           -name *.$(shared_lib_obj) -o \
                            -name '*.d' -o \
                            -name '*~' -o \
                            -name 'semantic.cache' -o \

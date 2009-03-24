@@ -26,14 +26,12 @@ endef
 
 
 # creates the object file for a C++ program
-%.$(cxx_prog_obj): %.$(cxx_src_suffix)
+%.o: %.$(cxx_src_suffix)
 	$(call make_depends,$@,$(filter %.$(cxx_src_suffix),$^))
 	$(call compile_source,$(filter %.$(cxx_src_suffix),$^),$@,)
 
 
 # creates an object file with the fpic option for C++ shared libraries
-%.$(cxx_sharedlib_obj): %.$(cxx_src_suffix)
+%.$(shared_lib_obj): %.$(cxx_src_suffix)
 	$(call make_depends,$@,$(filter %.$(cxx_src_suffix),$^))
 	$(call compile_source,$(filter %.$(cxx_src_suffix),$^),$@,-fpic)
-
-
