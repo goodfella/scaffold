@@ -11,49 +11,21 @@ include $(build_dir)/build.mk
 CXXFLAGS += -g -Wall -pedantic
 
 # the directories to copy all binaries to
-bin_dir := bin
+bin_dirs += bin
 
 # the include directories
-include_dirs :=
+include_dirs +=
 
 # the directories to copy all shared libraries to
-library_dirs := lib
+library_dirs += lib
 
 
-# these are variables filled in by the module.mk files
-sources :=
-cxxprograms :=
-shared_libraries :=
-plugins :=
-
-# all the dependency files in the project
-dependencies := $(shell find -name '*.d')
-
-modules := $(shell find -name 'module.mk')
-
-.PHONY: all clean line-count docs plugin-make plugin module.mk plugins etags sources
+.PHONY: all clean clean-build clean-targets line-count docs plugin-make plugin module.mk plugins etags sources
 
 all: libraries programs sources
 
-include $(modules)
-
-libraries: $(shared_libraries)
-programs: $(cxxprograms)
-plugins: $(plugins)
-sources:
-	$(foreach src,$(sources),\
-                  $(if $(src)_cp_dest,$(call cp,$(src),$($(src)_cp_dest))))
-
-clean:
-	rm -f $(shell find -name *.o -o \
-                           -name *.$(shared_lib_obj) -o \
-                           -name '*.d' -o \
-                           -name '*~' -o \
-                           -name 'semantic.cache' -o \
-                           -name '*.so.*') \
-             $(cxxprograms) \
-              bin/* \
-              lib/*
+clean: clean-build
+clean-all: clean-build clean-targets
 
 ifneq ($(MAKECMDGOALS),clean)
 include $(dependencies)
