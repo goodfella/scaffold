@@ -48,6 +48,7 @@ a_ln := LN
 # 2 = target string
 define abbrv_cmd
 $(if $($(abbrv)_echo),$($(abbrv)_echo) $(a_$1) \\t $2)
+
 endef
 
 
@@ -60,15 +61,19 @@ define gxx
 $(call abbrv_cmd,$0,$(2))
 	$(Q)$(CXX) $(1) -o $2 $3
 
+
 endef
 
 
-# copies a list of files to a directory
+# copies a list of files to a directory, if the directory does not
+# exist, it will be created
+
 # 1 = list of files to copy
 # 2 = destination
 define cp
 $(call abbrv_cmd,$0,$1 "->" $2)
 	@mkdir -p $2
 	$(Q)cp -t $2 $1
+
 
 endef

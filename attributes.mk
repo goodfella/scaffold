@@ -110,3 +110,10 @@ endef
 define src_cxxflags
 $(call attribute,$1,$0)
 endef
+
+
+# source cppflags to apply to all sources specified in the srcs
+# attribute
+define src_cppflags
+$(call attribute,$1,$0)
+endef

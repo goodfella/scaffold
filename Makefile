@@ -1,10 +1,6 @@
 # include the project specific settings
 include project.mk
 
-# set the path to the build directory to include the build system
-build_dir := .
-include $(build_dir)/build.mk
-
 # Makefile command line args go here
 
 
@@ -19,6 +15,10 @@ include_dirs +=
 # the directories to copy all shared libraries to
 library_dirs += lib
 
+# set the path to the build directory to include the build system
+build_dir := .
+include $(build_dir)/build.mk
+
 
 .PHONY: all clean clean-build clean-targets line-count docs plugin-make plugin module.mk plugins etags sources
 
@@ -26,7 +26,3 @@ all: libraries programs sources
 
 clean: clean-build
 clean-all: clean-build clean-targets
-
-ifneq ($(MAKECMDGOALS),clean)
-include $(dependencies)
-endif

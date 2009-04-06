@@ -3,6 +3,7 @@ include $(build_dir)/attributes.mk
 include $(build_dir)/commands.mk
 include $(build_dir)/functions.mk
 include $(build_dir)/implicit-rules.mk
+include $(build_dir)/module-helper.mk
 include $(build_dir)/modules.mk
 
 
@@ -10,12 +11,6 @@ include $(build_dir)/modules.mk
 
 # all the sources
 sources :=
-
-# all the object files for binaries
-objs :=
-
-# the shared library object files
-shared_lib_objs :=
 
 cxxprograms :=
 shared_libraries :=
@@ -27,7 +22,7 @@ dependencies := $(shell find -name '*.d')
 # module.mk files
 modules := $(shell find -name 'module.mk')
 
-.PHONY: all clean clean-build clean-targets
+.PHONY: clean clean-build clean-targets
 
 include $(modules)
 
@@ -45,7 +40,10 @@ clean-build:
                            -name '*.$(shared_lib_obj)')
 
 clean-targets:
-	rm -f $(shell find -name '*.so*' -o) \
-              $(bin_dir)/* \
-              $(library_dirs)/*
+	rm -f $(shell find -name '*.so*') \
+              $(foreach dir,$(bin_dirs),$(dir)/*) \
+              $(foreach dir,$(library_dirs),$(dir)/*)
 
+ifneq ($(MAKECMDGOALS),clean)
+include $(dependencies)
+endif
