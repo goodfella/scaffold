@@ -115,8 +115,8 @@ $(call relpath,$1): $(call create_obj_depends,$1) \
                    $(call link_libs,$(call prelibs,$1)), \
                    $$@,$$(filter %.o,$$^))
 
-	$(if $(bin_dir),\
-             $(foreach dir,$(bin_dir),$(call cp,$(call relpath,$1),$(dir))))
+	$(if $(bin_dirs),\
+             $(foreach dir,$(bin_dirs),$(call cp,$(call relpath,$1),$(dir))))
 
 	$(if $(call cp_dest, $1),\
              $(foreach dest,$(call cp_dest,$1),\
