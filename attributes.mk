@@ -38,16 +38,6 @@ endef
 
 # global attributes apply to all objects
 
-# places to copy the object to
-define cp_dest
-$(call attribute,$1,$0)
-endef
-
-# places to create symlinks to the object to
-define ln_dest
-$(call attribute,$1,$0)
-endef
-
 
 # compiled object attributes
 

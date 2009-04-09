@@ -60,9 +60,7 @@ $(call relpath,$1): $(call create_obj_depends,$1) \
                    $(call link_libs,$(call prelibs,$1)), \
                    $$@,$$(filter %.o,$$^))
 
-	$(foreach dir,$(bin_dirs),$(call cp,$(call relpath,$1),$(dir)))
-
-	$(foreach dest,$(call cp_dest,$1),$(call cp,$(call relpath,$1),$(dest)))
+	$(if $(bin_dir),$(call cp,$(call relpath,$1),$(bin_dir)))
 endef
 
 
@@ -74,6 +72,4 @@ define src_vars
 # create a variable for each source attribute
 $(call create_src_var,$1,cxxflags,$(call cxxflags,$1))
 $(call create_src_var,$1,cppflags,$(call cppflags,$1))
-$(call create_src_var,$1,cp_dest,$(call cp_dest,$1))
-
 endef

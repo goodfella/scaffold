@@ -7,13 +7,13 @@ include project.mk
 CXXFLAGS += -g -Wall -pedantic
 
 # the directories to copy all binaries to
-bin_dirs += bin
+bin_dir += bin
 
 # the include directories
 include_dirs +=
 
 # the directories to copy all shared libraries to
-library_dirs += lib
+library_dir += lib
 
 # set the path to the build directory to include the build system
 build_dir := .

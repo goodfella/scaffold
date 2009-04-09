@@ -48,7 +48,6 @@ a_ln := LN
 # 2 = target string
 define abbrv_cmd
 $(if $($(abbrv)_echo),$($(abbrv)_echo) $(a_$1) \\t $2)
-
 endef
 
 
@@ -71,9 +70,7 @@ endef
 # 1 = list of files to copy
 # 2 = destination
 define cp
-$(call abbrv_cmd,$0,$1 "->" $2)
+	$(call abbrv_cmd,$0,$1 "->" $2)
 	@mkdir -p $2
 	$(Q)cp -t $2 $1
-
-
 endef
