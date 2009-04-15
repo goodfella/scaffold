@@ -22,3 +22,20 @@ endef
 define link_libs
 $(foreach lib,$1,-l$(lib))
 endef
+
+
+# takes in a list of object file paths and redirects them to there
+# respective obj_dir path if obj_dir is defined.
+
+# 1 = list of object file pats
+define obj_path
+$(if $(obj_dir),$(foreach obj,$(1),$(addsuffix $(notdir $(obj)),$(addsuffix $(obj_dir)/,$(dir $(obj))))), \
+                $(1))
+endef
+
+
+# takes a list of object file paths and outputs the path based on the obj_dir variable
+define obj_dirpath
+$(if $(obj_dir),$(addsuffix $(obj_dir)/,$(dir $(1))),\
+                $(dir $(1)))
+endef

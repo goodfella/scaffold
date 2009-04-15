@@ -15,6 +15,9 @@ include_dirs +=
 # the directories to copy all shared libraries to
 library_dir += lib
 
+# directory to append to the directory of the object file
+obj_dir := .obj
+
 # set the path to the build directory to include the build system
 build_dir := .
 include $(build_dir)/build.mk
@@ -22,7 +25,7 @@ include $(build_dir)/build.mk
 
 .PHONY: all clean clean-build clean-targets line-count docs plugin-make plugin module.mk plugins etags sources
 
-all: libraries programs sources
+all: libraries programs
 
 clean: clean-build
 clean-all: clean-build clean-targets

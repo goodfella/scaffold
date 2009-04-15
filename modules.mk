@@ -1,6 +1,7 @@
-# generates the rules to build the targets in the module.mk files
+# generates the rules to build the targets in a module.mk file
 
-# processes a module.mk file
+# called from a module.mk file, this sets up the neccessary targets
+# for the objects defined in a module.mk
 define process_module
 
 # create the rules for the programs defined in the module
@@ -39,6 +40,8 @@ $(call create_src_var,$(call srcs,$1),cxxflags,$(call src_cxxflags,$1))
 # sets the src files cppflags
 $(call create_src_var,$(call srcs,$1),cppflags,$(call src_cppflags,$1))
 
+object_files += $(call create_obj_depends,$1)
+
 # rule to create the program.  The dependencies are the object files
 # obtained from the source files as well as the prelibs specified in
 # the module.mk
@@ -58,7 +61,7 @@ $(call relpath,$1): $(call create_obj_depends,$1) \
                    $(call linkopts,$1) \
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(call prelibs,$1)), \
-                   $$@,$$(filter %.o,$$^))
+                   $$@,$$(call obj_path,$$(filter %.o,$$^)))
 
 	$(if $(bin_dir),$(call cp,$(call relpath,$1),$(bin_dir)))
 endef

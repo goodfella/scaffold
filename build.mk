@@ -11,7 +11,7 @@ include $(build_dir)/modules.mk
 
 # all the sources
 sources :=
-
+object_files :=
 cxxprograms :=
 shared_libraries :=
 plugins :=
@@ -22,17 +22,20 @@ dependencies := $(shell find -name '*.d')
 # module.mk files
 modules := $(shell find -name 'module.mk')
 
-.PHONY: clean clean-build clean-targets
+.PHONY: clean clean-build clean-targets obj_dirs src_cp
 
 include $(modules)
 
-libraries: $(shared_libraries)
-programs: $(cxxprograms)
+libraries: obj_dirs $(shared_libraries)
+programs: obj_dirs $(cxxprograms)
 plugins: $(plugins)
 
-sources:
+src_cp:
 	$(foreach src,$(sources),\
                   $(if $(src)_cp_dest,$(call cp,$(src),$($(src)_cp_dest))))
+
+obj_dirs:
+	$(foreach obj,$(object_files),@mkdir -p $(call obj_dirpath,$(obj)))
 
 clean-build:
 	rm -f $(shell find -name '*.o' -o \
