@@ -43,11 +43,11 @@ obj_dirs:
 clean-build:
 	rm -f $(shell find -name '*.o' -o \
                            -name '*.d' -o \
-                           -name '*.$(shared_lib_obj)')
+                           -name '*.$(shared_lib_obj)' -o \
+                           -name '*~')
 
 clean-targets:
-	rm -f $(shell find -name '*.so*')\
-        $(foreach dir,$(bin_dir),$(dir)/*) \
+	rm -f $(bin_dir)/* \
         $(cxxprograms) \
         $(shared_libraries) \
-        $(foreach dir,$(library_dirs),$(dir)/*)
+        $(library_dir)/*
