@@ -45,8 +45,7 @@ object_files += $(call create_obj_depends,$1)
 # rule to create the program.  The dependencies are the object files
 # obtained from the source files as well as the prelibs specified in
 # the module.mk
-$(call relpath,$1): $(call create_obj_depends,$1) \
-                    $(call create_prelib_depends,$1)
+$(call relpath,$1): $(call create_obj_depends,$1) $(call create_prelib_depends,$1)
 
 	$(call gxx,$(CXXFLAGS) \
                    $(call cxxflags,$1) \
@@ -61,7 +60,7 @@ $(call relpath,$1): $(call create_obj_depends,$1) \
                    $(call linkopts,$1) \
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(call prelibs,$1)), \
-                   $$@,$$(call obj_path,$$(filter %.o,$$^)))
+                   $$@,$$(filter %.o,$$^))
 
 	$(if $(bin_dir),$(call cp,$(call relpath,$1),$(bin_dir)))
 endef

@@ -14,7 +14,6 @@ sources :=
 object_files :=
 cxxprograms :=
 shared_libraries :=
-plugins :=
 
 # all the dependency files in the project
 dependencies := $(shell find -name '*.d')
@@ -22,7 +21,11 @@ dependencies := $(shell find -name '*.d')
 # module.mk files
 modules := $(shell find -name 'module.mk')
 
-.PHONY: clean clean-build clean-targets obj_dirs src_cp
+.PHONY: clean clean-build clean-targets obj_dirs src_cp programs libraries
+
+ifneq ($(MAKECMDGOALS),clean)
+include $(dependencies)
+endif
 
 include $(modules)
 
@@ -43,10 +46,8 @@ clean-build:
                            -name '*.$(shared_lib_obj)')
 
 clean-targets:
-	rm -f $(shell find -name '*.so*') \
-              $(foreach dir,$(bin_dirs),$(dir)/*) \
-              $(foreach dir,$(library_dirs),$(dir)/*)
-
-ifneq ($(MAKECMDGOALS),clean)
-include $(dependencies)
-endif
+	rm -f $(shell find -name '*.so*')\
+        $(foreach dir,$(bin_dir),$(dir)/*) \
+        $(cxxprograms) \
+        $(shared_libraries) \
+        $(foreach dir,$(library_dirs),$(dir)/*)
