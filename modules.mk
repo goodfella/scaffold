@@ -74,4 +74,5 @@ define src_vars
 # create a variable for each source attribute
 $(call create_src_var,$1,cxxflags,$(call cxxflags,$1))
 $(call create_src_var,$1,cppflags,$(call cppflags,$1))
+$(call create_src_var,$1,incdirs,$(call incdirs,$1))
 endef
