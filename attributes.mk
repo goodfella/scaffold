@@ -107,3 +107,32 @@ endef
 define src_cppflags
 $(call attribute,$1,$0)
 endef
+
+
+# rule to invoke before building the target.  Note that the targets
+# prerequisites are built before this rule is invoked, and also that
+# each pre_rule must be unique among targets defined in the module.mk
+# files
+define pre_rules
+$(call attribute,$1,$0)
+endef
+
+
+# resets all attributes
+# 1 = object
+define reset_attributes
+$(1)_ccflags :=
+$(1)_cxxflags :=
+$(1)_cppflags :=
+$(1)_incdirs :=
+$(1)_ldflags :=
+$(1)_prelibs :=
+$(1)_linkopts :=
+$(1)_libdirs :=
+$(1)_libs :=
+$(1)_srcs :=
+$(1)_src_cxxflags :=
+$(1)_src_cppflags :=
+$(1)_pre_rule :=
+$(1)_post_rule :=
+endef

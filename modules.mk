@@ -43,9 +43,9 @@ $(call create_src_var,$(call srcs,$1),cppflags,$(call src_cppflags,$1))
 object_files += $(call create_obj_depends,$1)
 
 # rule to create the program.  The dependencies are the object files
-# obtained from the source files as well as the prelibs specified in
-# the module.mk
-$(call relpath,$1): $(call create_obj_depends,$1) $(call create_prelib_depends,$1)
+# obtained from the source files, and the prelibs, and the pre_rules
+# specified in the module.mk
+$(call relpath,$1): $(call create_obj_depends,$1) $(call create_prelib_depends,$1) | $(call pre_rules,$1)
 
 	$(call gxx,$(CXXFLAGS) \
                    $(call cxxflags,$1) \
@@ -63,6 +63,8 @@ $(call relpath,$1): $(call create_obj_depends,$1) $(call create_prelib_depends,$
                    $$@,$$(filter %.$(cxx_prog_obj),$$^))
 
 	$(if $(bin_dir),$(call cp,$(call relpath,$1),$(bin_dir)))
+
+$(call reset_attributes,$1)
 endef
 
 
@@ -75,4 +77,5 @@ define src_vars
 $(call create_src_var,$1,cxxflags,$(call cxxflags,$1))
 $(call create_src_var,$1,cppflags,$(call cppflags,$1))
 $(call create_src_var,$1,incdirs,$(call incdirs,$1))
+$(call reset_attributes,$1)
 endef
