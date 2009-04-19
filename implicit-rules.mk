@@ -26,7 +26,7 @@ endef
 
 
 # creates the object file for a C++ program
-%.o:
+%.$(cxx_prog_obj):
 	$(call make_depends,$@,$(call obj_src,$@,$(cxx_src_suffix)))
 	$(call compile_source,$@,$(call obj_src,$@,$(cxx_src_suffix)),)
 

@@ -49,6 +49,6 @@ endef
 # 1 = object file path
 # 2 = source file suffix
 define obj_src
-$(if $(obj_dir),$(patsubst %$(suffix $1),%.$2,$(subst $(obj_dir)/,,$1)),\
-                $(patsubst %$(suffix %$1),%.$2,$1))
+$(if $(obj_dir),$(patsubst %.$(cxx_prog_obj),%.$2,$(subst $(obj_dir)/,,$1)),\
+                $(patsubst %$(cxx_prog_obj),%.$2,$1))
 endef

@@ -60,7 +60,7 @@ $(call relpath,$1): $(call create_obj_depends,$1) $(call create_prelib_depends,$
                    $(call linkopts,$1) \
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(call prelibs,$1)), \
-                   $$@,$$(filter %.o,$$^))
+                   $$@,$$(filter %.$(cxx_prog_obj),$$^))
 
 	$(if $(bin_dir),$(call cp,$(call relpath,$1),$(bin_dir)))
 endef

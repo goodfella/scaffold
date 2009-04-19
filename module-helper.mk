@@ -53,5 +53,5 @@ endef
 
 # 1 = target
 define create_obj_depends
-$(call obj_path,$(call relpath,$(call src_obj,$(call srcs,$1),o)))
+$(call obj_path,$(call relpath,$(call src_obj,$(call srcs,$1),$(cxx_prog_obj))))
 endef
