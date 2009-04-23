@@ -41,17 +41,24 @@ $(foreach src,$1,$(if $3,$(eval $(call relpath,$(src))_$(2)+=$3)))
 endef
 
 
+# 1 = library name
+define prelib_target
+prelib_$(1)
+endef
+
+
 # generates the prelib depends string
 
 # 1 = target
-define create_prelib_depends
-$(foreach prelib,$(call prelibs,$1),$(value prelib_$(prelib)))
+define prelib_depends
+$(foreach prelib,$(call prelibs,$1),$(call prelib_target,$(prelib)))
 endef
 
 
 # generates the object depends string
 
 # 1 = target
-define create_obj_depends
-$(call obj_path,$(call relpath,$(call src_obj,$(call srcs,$1),$(cxx_prog_obj))))
+# 2 = object file suffix
+define obj_depends
+$(call obj_path,$(call relpath,$(call src_obj,$(call srcs,$1),$2)))
 endef

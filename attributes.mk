@@ -109,6 +109,26 @@ $(call attribute,$1,$0)
 endef
 
 
+# the following three attributes are for shared libraries and are used
+# to specify the version information
+
+# libexample.so.<version>.<minor>.<release>
+
+# library version number
+define version
+$(call attribute,$1,$0)
+endef
+
+# library minor number
+define minor
+$(call attribute,$1,$0)
+endef
+
+# library minor number
+define release
+$(call attribute,$1,$0)
+endef
+
 # rule to invoke before building the target.  Note that the targets
 # prerequisites are built before this rule is invoked, and also that
 # each pre_rule must be unique among targets defined in the module.mk
@@ -119,6 +139,7 @@ endef
 
 
 # resets all attributes
+
 # 1 = object
 define reset_attributes
 $(1)_ccflags :=

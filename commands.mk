@@ -7,6 +7,7 @@ ifdef V
     BUILD_VERBOSE = $(V)
   endif
 endif
+
 ifndef BUILD_VERBOSE
   BUILD_VERBOSE := 0
 endif

@@ -7,9 +7,11 @@
 # 2 = path of source file
 # 3 = extra flags
 define compile_source
-$(call gxx,$(CXXFLAGS) $(CPPFLAGS) $(include_dirs:%=-I%) $3 \
+$(call gxx,$(CXXFLAGS) \
            $(call cxxflags,$2) \
+           $(CPPFLAGS) \
            $(call cppflags,$2) \
+           $(call inc_dirs,$(include_dirs)) \
            $(call inc_dirs,$(call incdirs,$2)) -c,$(1),$(2))
 endef
 
@@ -27,16 +29,19 @@ endef
 
 # creates the object file for a C++ program
 %.$(cxx_prog_obj):
-	$(call make_depends,$@,$(call obj_src,$@,$(cxx_src_suffix)))
-	$(call compile_source,$@,$(call obj_src,$@,$(cxx_src_suffix)),)
+	$(call make_depends,$@,$(call obj_src,$@,$(cxx_prog_obj),$(cxx_src_suffix)))
+	$(call compile_source,$@,$(call obj_src,$@,$(cxx_prog_obj),$(cxx_src_suffix)),)
 
 
 # creates an object file with the fpic option for C++ shared libraries
-%.$(shared_lib_obj): %.$(cxx_src_suffix)
-	$(call make_depends,$@,$(filter %.$(cxx_src_suffix),$^))
-	$(call compile_source,$@,$(filter %.$(cxx_src_suffix),$^),-fpic)
+%.$(cxx_shlib_obj):
+	$(call make_depends,$@,$(call obj_src,$@,$(cxx_shlib_obj),$(cxx_src_suffix)))
+	$(call compile_source,$@,$(call obj_src,$@,$(cxx_shlib_obj),$(cxx_src_suffix)),-fpic)
 
 
 # override so we don't try to build programs from rules not set as
 # phony
-% : %.o
+% : %.$(cxx_prog_obj)
+
+
+% : %.$(cxx_shlib_obj)

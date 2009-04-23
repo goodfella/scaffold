@@ -43,7 +43,7 @@ obj_dirs:
 clean-build:
 	rm -f $(shell find -name '*.o' -o \
                            -name '*.d' -o \
-                           -name '*.$(shared_lib_obj)' -o \
+                           -name '*.$(cxx_shlib_obj)' -o \
                            -name '*~')
 
 clean-targets:

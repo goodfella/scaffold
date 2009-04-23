@@ -8,7 +8,7 @@ CXXFLAGS += -g -Wall -pedantic
 bin_dir += bin
 
 # the include directories
-include_dirs +=
+include_dirs += .
 
 # the directories to copy all shared libraries to
 library_dir += lib
