@@ -12,8 +12,8 @@ include $(build_dir)/modules.mk
 # all the sources
 sources :=
 object_files :=
-cxxprograms :=
-shared_libraries :=
+cxx_progs :=
+cxx_shlibs :=
 
 # all the dependency files in the project
 dependencies := $(shell find -name '*.d')
@@ -29,8 +29,8 @@ endif
 
 include $(modules)
 
-libraries: obj_dirs $(shared_libraries)
-programs: obj_dirs $(cxxprograms)
+libraries: obj_dirs $(cxx_shlibs)
+programs: obj_dirs $(cxx_progs)
 plugins: $(plugins)
 
 src_cp:
@@ -48,6 +48,6 @@ clean-build:
 
 clean-targets:
 	rm -f $(bin_dir)/* \
-        $(cxxprograms) \
-        $(shared_libraries) \
+        $(cxx_progs) \
+        $(cxx_shlibs) \
         $(library_dir)/*

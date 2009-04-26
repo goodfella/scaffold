@@ -46,8 +46,8 @@ $(foreach shlib,$(local_cxx_shlibs),$(eval $(call cxx_shlib_rule,$(shlib))))
 
 
 sources += $(call relpath,$(local_srcs))
-cxxprograms += $(call relpath,$(local_cxx_progs))
-shared_libraries += $(call relpath,$(local_cxx_shlibs))
+cxx_progs += $(call relpath,$(local_cxx_progs))
+cxx_shlibs += $(call relpath,$(local_cxx_shlibs))
 plugins += $(call relpath,$(local_plugs))
 
 # reset module variables
