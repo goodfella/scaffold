@@ -1,4 +1,6 @@
-include $(build_dir)/globals.mk
+# this file should be included by the projects top level Makefile
+
+include $(build_dir)/variables.mk
 include $(build_dir)/attributes.mk
 include $(build_dir)/commands.mk
 include $(build_dir)/functions.mk
@@ -33,18 +35,20 @@ libraries: obj_dirs $(cxx_shlibs)
 programs: obj_dirs $(cxx_progs)
 plugins: $(plugins)
 
+obj_dirs: 
+	@mkdir -p $(dir $(object_files))
+
 src_cp:
 	$(foreach src,$(sources),\
                   $(if $(src)_cp_dest,$(call cp,$(src),$($(src)_cp_dest))))
 
-obj_dirs:
-	$(foreach obj,$(object_files),@mkdir -p $(call obj_dirpath,$(obj)))
-
 clean-build:
-	rm -f $(shell find -name '*.o' -o \
+	rm -f $(shell find -name '*.$(cxx_prog_obj)' -o \
                            -name '*.d' -o \
                            -name '*.$(cxx_shlib_obj)' -o \
                            -name '*~')
+
+	rm -rf $(dir $(object_files))
 
 clean-targets:
 	rm -f $(bin_dir)/* \

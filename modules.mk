@@ -1,31 +1,26 @@
 # generates the rules to build the targets in a module.mk file
 
-# 1 = library name
+# 1 = library name or path
 define linker_name
-lib$(1).so
+$(dir $1)lib$(notdir $1).so
 endef
 
 
 # 1 = library name
 define soname
-$(call linker_name,$(1)).$(call version,$(1))
+$(call linker_name,$(1)).$(call version,$(notdir $1))
 endef
+
 
 # 1 = library name
 define real_name
-$(call soname,$(1)).$(call minor,$1).$(call release,$1)
+$(call soname,$(1)).$(call minor,$(notdir $1)).$(call release,$(notdir $1))
 endef
 
 
-# 1 = library name
-define shlib_linker_name_target
-$(call relpath,$(call linker_name,$(1)))
-endef
-
-
-# 1 = library name
-define shlib_real_name_target
-$(call relpath,$(call real_name,$1))
+# 1 = object name
+define prelib_depends
+$(foreach prelib,$(call prelibs,$1),$(call linker_name,$(prelib)))
 endef
 
 
@@ -37,17 +32,16 @@ define process_module
 $(foreach src,$(local_srcs),$(eval $(call src_vars,$(src))))
 
 
-# create the rules for the C++ programs defined in the module
-$(foreach prog,$(local_cxx_progs),$(eval $(call cxx_prog_rule,$(prog))))
-
-
 # create the rules for the C++ shared libraries
-$(foreach shlib,$(local_cxx_shlibs),$(eval $(call cxx_shlib_rule,$(shlib))))
+$(foreach shlib,$(local_cxx_shlibs),$(eval $(call cxx_shlib_rule,$(shlib),$(call relpath,$(shlib)))))
+
+
+# create the rules for the C++ programs defined in the module
+$(foreach prog,$(local_cxx_progs),$(eval $(call cxx_prog_rule,$(prog),$(call relpath,$(prog)))))
 
 
 sources += $(call relpath,$(local_srcs))
 cxx_progs += $(call relpath,$(local_cxx_progs))
-cxx_shlibs += $(call relpath,$(local_cxx_shlibs))
 plugins += $(call relpath,$(local_plugs))
 
 # reset module variables
@@ -62,6 +56,7 @@ endef
 # creates the rule for a C++ program
 
 # 1 = program name
+# 2 = program full path
 define cxx_prog_rule
 
 # checks to make sure a srcs variable is declared
@@ -77,9 +72,10 @@ object_files += $(call obj_depends,$1,$(cxx_prog_obj))
 
 
 # rule to create the program.  The dependencies are the object files
-# obtained from the source files, and the prelibs, and the pre_rules
+# obtained from the source files, and the prelibs, and pre_rules
 # specified in the module.mk
-$(call relpath,$1): $(call obj_depends,$1,$(cxx_prog_obj)) $(call prelib_depends,$1) | $(call pre_rules,$1)
+$(2): $(call obj_depends,$1,$(cxx_prog_obj)) $(call prelib_depends,$1) \
+      | $(call pre_rules,$1)
 
 	$(call gxx,$(CXXFLAGS) \
                    $(call cxxflags,$1) \
@@ -93,10 +89,10 @@ $(call relpath,$1): $(call obj_depends,$1,$(cxx_prog_obj)) $(call prelib_depends
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
                    $(call link_libs,$(call libs,$1)) \
-                   $(call link_libs,$(call prelibs,$1)), \
+                   $(call link_libs,$(notdir $(call prelibs,$1))), \
                    $$@,$$(filter %.$(cxx_prog_obj),$$^))
 
-	$(if $(bin_dir),$(call cp,$(call relpath,$1),$(bin_dir)))
+	$(if $(bin_dir),$(call cp,$2,$(bin_dir)))
 
 $(call reset_attributes,$1)
 endef
@@ -104,6 +100,7 @@ endef
 
 # rule to create C++ shared libraries.
 # 1 = shared library name
+# 2 = shared library path
 define cxx_shlib_rule
 
 # check if srcs variable is set
@@ -128,18 +125,19 @@ $(call create_src_var,$(call srcs,$1),cxxflags,$(call src_cxxflags,$1))
 $(call create_src_var,$(call srcs,$1),cppflags,$(call src_cppflags,$1))
 
 
+cxx_shlibs += $(call real_name,$2)
+
+
 # library rules
 
-# prelib target for programs
+$(call linker_name,$2): $(call real_name,$2)
 
-# prelib_<library-name>: /path/to/lib/lib<library-name>.so.<version>.<minor>.<release>
-$(call prelib_target,$1): $(call shlib_real_name_target,$1)
+$(call soname,$2): $(call real_name,$2)
 
-# /path/to/lib/lib<library-name>.so: /path/to/lib/lib<library-name>.so.<version>.<minor>.<release>
-$(call shlib_linker_name_target,$1): $(call shlib_real_name_target,$1)
-
-# /path/to/lib/lib<lib-name>.so.<version>.<minor>.<release>: <object files> <prelibs> | <pre_rule>
-$(call shlib_real_name_target,$1): $(call obj_depends,$1,$(cxx_shlib_obj)) $(call prelib_depends,$1) | $(call pre_rule,$1)
+# /path/to/lib/lib<library-name>.so: <object files> <prelibs> | <pre_rule>
+$(call real_name,$2): $(call obj_depends,$1,$(cxx_shlib_obj)) \
+                                   $(call prelib_depends,$1) | \
+                                   $(call pre_rule,$1)
 
 	$(call gxx,-shared -Wl$(,)-soname$(,)$(call soname,$1) \
                    $(CXXFLAGS) \
@@ -154,7 +152,7 @@ $(call shlib_real_name_target,$1): $(call obj_depends,$1,$(cxx_shlib_obj)) $(cal
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
                    $(call link_libs,$(call libs,$1)) \
-                   $(call link_libs,$(call prelibs,$1)), \
+                   $(call link_libs,$(notdir $(call prelibs,$1))), \
                    $$@,$$(filter %.$(cxx_shlib_obj),$$^))
 
 	ln -snf $$(notdir $$@) $$(dir $$@)$(call soname,$1)

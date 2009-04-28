@@ -41,20 +41,6 @@ $(foreach src,$1,$(if $3,$(eval $(call relpath,$(src))_$(2)+=$3)))
 endef
 
 
-# 1 = library name
-define prelib_target
-prelib_$(1)
-endef
-
-
-# generates the prelib depends string
-
-# 1 = target
-define prelib_depends
-$(foreach prelib,$(call prelibs,$1),$(call prelib_target,$(prelib)))
-endef
-
-
 # generates the object depends string
 
 # 1 = target

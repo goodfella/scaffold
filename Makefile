@@ -23,7 +23,7 @@ include $(build_dir)/build.mk
 
 .PHONY: all clean clean-all line-count docs plugin-make plugin module.mk plugins etags sources
 
-all: programs
+all: programs libraries
 
 clean: clean-build
 clean-all: clean-build clean-targets
