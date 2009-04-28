@@ -126,6 +126,7 @@ $(call create_src_var,$(call srcs,$1),cppflags,$(call src_cppflags,$1))
 
 
 cxx_shlibs += $(call real_name,$2)
+clean_files += $(call linker_name,$2) $(call soname,$2)
 
 
 # library rules
