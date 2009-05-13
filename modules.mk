@@ -156,8 +156,10 @@ $(call real_name,$2): $(call obj_depends,$1,$(cxx_shlib_obj)) \
                    $(call link_libs,$(notdir $(call prelibs,$1))), \
                    $$@,$$(filter %.$(cxx_shlib_obj),$$^))
 
-	ln -snf $$(notdir $$@) $$(dir $$@)$$(notdir $(call soname,$1))
-	ln -snf $$(notdir $$@) $$(dir $$@)$$(notdir $(call linker_name,$1))
+	$(call ln,$$(notdir $$@),$$(dir $$@)$$(notdir $(call soname,$1)))
+	$(call ln,$$(notdir $$@),$$(dir $$@)$$(notdir $(call linker_name,$1)))
+
+	$(if $(lib_dir),$(call cp,$(call real_name,$2),$(lib_dir)))
 
 $(call reset_attributes,$1)
 endef
