@@ -85,8 +85,10 @@ clean-targets:
 
 # removes the binary directory and the library directory
 clean-dirs:
-	$(if $(bin_dir),rm -rf  $(bin_dir))
-	$(if $(lib_dir),rm -rf  $(lib_dir))
+	$(if $(bin_dir),rm -f $(addprefix $(bin_dir)/,$(notdir $(cxx_progs))))
+	$(if $(lib_dir),rm -f $(addprefix $(lib_dir)/,$(notdir $(cxx_shlibs))))
+	$(if $(bin_dir),-rmdir $(bin_dir))
+	$(if $(lib_dir),-rmdir $(lib_dir))
 
 
 # removes all the files specified in the clean_files variable
