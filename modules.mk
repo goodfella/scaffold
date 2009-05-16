@@ -69,7 +69,7 @@ $(call create_src_var,$(call srcs,$1),cxxflags,$(call src_cxxflags,$1))
 $(call create_src_var,$(call srcs,$1),cppflags,$(call src_cppflags,$1))
 
 object_files += $(call obj_depends,$1,$(cxx_prog_obj))
-bin_dir_files += $(1)
+bin_dir_files += $(notdir $(1))
 sources += $(call srcs,$1)
 
 
@@ -87,7 +87,7 @@ $(2): $(call obj_depends,$1,$(cxx_prog_obj)) $(call prelib_depends,$1) \
                    $(call ldflags,$1) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
-                   $(call lib_dirs,$(library_dirs)) \
+                   $$(call lib_dirs,$$(library_dirs)) \
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
                    $(call link_libs,$(call libs,$1)) \
@@ -128,6 +128,7 @@ cxx_shlibs += $(call real_name,$2)
 clean_files += $(call linker_name,$2) $(call soname,$2)
 lib_dir_files += $(notdir $(call linker_name,$1) $(call soname,$1) $(call real_name,$1))
 sources += $(call srcs,$1)
+library_dirs += $(dir $2)
 
 # library rules
 
@@ -140,7 +141,7 @@ $(call real_name,$2): $(call obj_depends,$1,$(cxx_shlib_obj)) \
                                    $(call prelib_depends,$1) | \
                                    $(call pre_rule,$1)
 
-	$(call gxx,-shared -Wl$(,)-soname$(,)$(call soname,$1) \
+	$(call gxx,-shared -Wl$(,)-soname$(,)$(notdir $(call soname,$1)) \
                    $(CXXFLAGS) \
                    $(call cxxflags,$1) \
                    $(CPPFLAGS) \
@@ -149,7 +150,7 @@ $(call real_name,$2): $(call obj_depends,$1,$(cxx_shlib_obj)) \
                    $(call ldflags,$1) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
-                   $(call lib_dirs,$(library_dirs)) \
+                   $$(call lib_dirs,$$(library_dirs)) \
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
                    $(call link_libs,$(call libs,$1)) \
