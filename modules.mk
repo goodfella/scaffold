@@ -90,6 +90,7 @@ $(2): $(call obj_depends,$1,$(cxx_prog_obj)) $(call prelib_depends,$1) \
                    $$(call lib_dirs,$$(library_dirs)) \
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
+                   $(call link_opts_string,$(linker_opts)) \
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(notdir $(call prelibs,$1))), \
                    $$@,$$(filter %.$(cxx_prog_obj),$$^))
@@ -153,6 +154,7 @@ $(call real_name,$2): $(call obj_depends,$1,$(cxx_shlib_obj)) \
                    $$(call lib_dirs,$$(library_dirs)) \
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
+                   $(call link_opts_string,$(linker_opts)) \
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(notdir $(call prelibs,$1))), \
                    $$@,$$(filter %.$(cxx_shlib_obj),$$^))

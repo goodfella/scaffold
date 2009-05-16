@@ -27,9 +27,6 @@
 # name of the object
 
 
-# this enables us to put commas in variables
-, := ,
-
 # 1 = name of object
 # 2 = name of attribute
 define attribute
@@ -77,7 +74,7 @@ endef
 
 # comma deliminated list of options to pass to linker
 define linkopts
-$(if $(call attribute,$1,$0),-Wl$(,)$(call attribute,$1,$0))
+$(call link_opts_string,$(call attribute,$1,$0))
 endef
 
 # directories to find libraries in -L

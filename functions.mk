@@ -53,3 +53,12 @@ define obj_src
 $(if $(obj_dir),$(patsubst %.$(2),%.$3,$(subst $(obj_dir)/,,$1)),\
                 $(patsubst %$(2),%.$3,$1))
 endef
+
+
+# returns the string for linker options i.e. -Wl,<options>.  If an
+# empty string is given, then an empty string is returned
+
+# 1 = possible linker options
+define link_opts_string
+$(if $(1),-Wl$(,)$1,)
+endef

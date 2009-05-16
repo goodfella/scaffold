@@ -7,3 +7,7 @@ cxx_shlib_obj := cxx.shlib.o
 cxx_prog_obj := cxx.o
 
 semi_colon := ;
+
+# this enables us to put commas in variables
+, := ,
+

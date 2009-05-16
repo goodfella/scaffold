@@ -4,6 +4,9 @@ include project.mk
 # global cxx flags used by all g++ invocations
 CXXFLAGS += -g -Wall -pedantic
 
+# global linker options
+linker_opts := -rpath,$(CURDIR)/lib
+
 # the directories to copy all binaries to
 bin_dir += bin
 
