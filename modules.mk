@@ -69,6 +69,8 @@ $(call create_src_var,$(call srcs,$1),cxxflags,$(call src_cxxflags,$1))
 $(call create_src_var,$(call srcs,$1),cppflags,$(call src_cppflags,$1))
 
 object_files += $(call obj_depends,$1,$(cxx_prog_obj))
+bin_dir_files += $(1)
+sources += $(call srcs,$1)
 
 
 # rule to create the program.  The dependencies are the object files
@@ -115,19 +117,17 @@ $(if $(call minor,$1),,$(error shared library $(1) is missing a $(1)_minor varia
 # check if release variable is set
 $(if $(call release,$1),,$(error shared library $(1) is missing a $(1)_release variable))
 
-object_files += $(call obj_depends,$1,$(cxx_shlib_obj))
-
-
 # sets the src files cxxflags
 $(call create_src_var,$(call srcs,$1),cxxflags,$(call src_cxxflags,$1))
 
 # sets the src files cppflags
 $(call create_src_var,$(call srcs,$1),cppflags,$(call src_cppflags,$1))
 
-
+object_files += $(call obj_depends,$1,$(cxx_shlib_obj))
 cxx_shlibs += $(call real_name,$2)
 clean_files += $(call linker_name,$2) $(call soname,$2)
-
+lib_dir_files += $(notdir $(call linker_name,$1) $(call soname,$1) $(call real_name,$1))
+sources += $(call srcs,$1)
 
 # library rules
 
@@ -156,10 +156,13 @@ $(call real_name,$2): $(call obj_depends,$1,$(cxx_shlib_obj)) \
                    $(call link_libs,$(notdir $(call prelibs,$1))), \
                    $$@,$$(filter %.$(cxx_shlib_obj),$$^))
 
-	$(call ln,$$(notdir $$@),$$(dir $$@)$$(notdir $(call soname,$1)))
-	$(call ln,$$(notdir $$@),$$(dir $$@)$$(notdir $(call linker_name,$1)))
+	$(call ln,$$(notdir $$@),$$(dir $$@)$(notdir $(call soname,$1)))
+	$(call ln,$$(notdir $$@),$$(dir $$@)$(notdir $(call linker_name,$1)))
 
-	$(if $(lib_dir),$(call cp,$(call real_name,$2),$(lib_dir)))
+	$(if $(lib_dir),$(call cp,$$@,$(lib_dir)))
+
+	$(if $(lib_dir),$(call ln,$$(notdir $$@),$(lib_dir)/$(notdir $(call soname,$1))))
+	$(if $(lib_dir),$(call ln,$$(notdir $$@),$(lib_dir)/$(notdir $(call linker_name,$1))))
 
 $(call reset_attributes,$1)
 endef
