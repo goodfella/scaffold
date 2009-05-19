@@ -1,3 +1,5 @@
+# Copyright (C) 2009 Nicholas Guiffrida
+
 # contains defines for commands used in the build process and sets up
 # abbreviated outputs
 

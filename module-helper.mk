@@ -1,3 +1,5 @@
+# Copyright (C) 2009 Nicholas Guiffrida
+
 # functions used in all modules.mk's
 
 # directory the module is in

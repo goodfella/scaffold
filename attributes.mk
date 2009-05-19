@@ -1,3 +1,5 @@
+# Copyright (C) 2009 Nicholas Guiffrida
+
 # defines for attributes for the different types of objects.  Objects
 # are what the build system acts on.  The object hierarchy is as
 # follows (super objects are at the far left):

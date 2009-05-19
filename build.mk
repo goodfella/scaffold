@@ -1,3 +1,5 @@
+# Copyright (C) 2009 Nicholas Guiffrida
+
 # this file should be included by the projects top level Makefile.  It
 # defines the default build and clean targets
 

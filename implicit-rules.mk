@@ -1,3 +1,5 @@
+# Copyright (C) 2009 Nicholas Guiffrida
+
 # all the implicit rules
 
 

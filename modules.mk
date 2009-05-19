@@ -1,3 +1,5 @@
+# Copyright (C) 2009 Nicholas Guiffrida
+
 # generates the rules to build the targets in a module.mk file
 
 # 1 = library name or path

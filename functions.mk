@@ -1,3 +1,5 @@
+# Copyright (C) 2009 Nicholas Guiffrida
+
 # functions that are used throughout the build system
 
 # creates a list of -I includes from a list of directories

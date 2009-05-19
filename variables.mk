@@ -1,3 +1,5 @@
+# Copyright (C) 2009 Nicholas Guiffrida
+
 # global variables used by the build system
 
 # suffix for C++ shared library object files
