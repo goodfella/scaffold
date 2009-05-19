@@ -29,15 +29,15 @@ endef
 define process_module
 
 # creates variables for source attributes
-$(foreach src,$(local_srcs),$(eval $(call src_vars,$(src))))
+$(foreach src,$(local_srcs),$(call src_vars,$(src)))
 
 
 # create the rules for the C++ shared libraries
-$(foreach shlib,$(local_cxx_shlibs),$(eval $(call cxx_shlib_rule,$(shlib),$(call relpath,$(shlib)))))
+$(foreach shlib,$(local_cxx_shlibs),$(call cxx_shlib_rule,$(shlib),$(call relpath,$(shlib))))
 
 
 # create the rules for the C++ programs defined in the module
-$(foreach prog,$(local_cxx_progs),$(eval $(call cxx_prog_rule,$(prog),$(call relpath,$(prog)))))
+$(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),$(call relpath,$(prog))))
 
 
 sources += $(call relpath,$(local_srcs))
