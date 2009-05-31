@@ -94,7 +94,7 @@ define srcs
 $(call attribute,$1,$0)
 endef
 
-# source cxxflags to apply to all source specified in the srcs
+# source cxxflags to apply to all sources specified in the srcs
 # attribute
 define src_cxxflags
 $(call attribute,$1,$0)
@@ -153,6 +153,8 @@ $(1)_libs :=
 $(1)_srcs :=
 $(1)_src_cxxflags :=
 $(1)_src_cppflags :=
-$(1)_pre_rule :=
-$(1)_post_rule :=
+$(1)_version :=
+$(1)_minor :=
+$(1)_release :=
+$(1)_pre_rules :=
 endef
