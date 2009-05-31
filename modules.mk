@@ -26,6 +26,32 @@ $(foreach prelib,$(call prelibs,$1),$(call linker_name,$(prelib)))
 endef
 
 
+# compiles a single source file into an object file
+
+# 1 = path of object file
+# 2 = path of source file
+# 3 = extra flags
+define compile_source
+$(call gxx,$(CXXFLAGS) \
+           $(call cxxflags,$2) \
+           $(CPPFLAGS) \
+           $(call cppflags,$2) \
+           $(call inc_dirs,$(include_dirs)) \
+           $(call inc_dirs,$(call incdirs,$2)) -c,$(1),$(2))
+endef
+
+
+# creates the depends file for an object file
+
+# 1 = target path
+# 2 = infile path
+define make_depends
+$(call gxx,-M -MM -MD -MT $(1) $(include_dirs:%=-I%) \
+           $(call cppflags,$2) $(call inc_dirs,$(call incdirs,$2)),\
+           $(addsuffix .d,$1),$2)
+endef
+
+
 # called from a module.mk file, this sets up the neccessary targets
 # for the objects defined in a module.mk
 define process_module
@@ -41,7 +67,6 @@ $(foreach shlib,$(local_cxx_shlibs),$(call cxx_shlib_rule,$(shlib),$(call relpat
 # create the rules for the C++ programs defined in the module
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),$(call relpath,$(prog))))
 
-
 sources += $(call relpath,$(local_srcs))
 cxx_progs += $(call relpath,$(local_cxx_progs))
 plugins += $(call relpath,$(local_plugs))
@@ -52,6 +77,18 @@ local_cxx_shlibs :=
 local_srcs :=
 local_plugs :=
 
+endef
+
+
+# creates the rule for an object file
+
+# 1 = source file path
+# 2 = object file suffix
+# 3 = extra gcc args
+define obj_rule
+$(call obj_path,$(addsuffix .$2,$(basename $1))): $1
+	$(call make_depends,$$@,$$<)
+	$(call compile_source,$$@,$$<,$3)
 endef
 
 
@@ -98,6 +135,9 @@ $(2): $(call obj_depends,$1,$(cxx_prog_obj)) $(call prelib_depends,$1) \
                    $$@,$$(filter %.$(cxx_prog_obj),$$^))
 
 	$(if $(bin_dir),$(call cp,$2,$(bin_dir)))
+
+# generate the rules for each object file
+$(foreach src,$(call relpath,$(call srcs,$1)),$(call obj_rule,$(src),$(cxx_prog_obj),))
 
 $(call reset_attributes,$1)
 endef
@@ -168,6 +208,9 @@ $(call real_name,$2): $(call obj_depends,$1,$(cxx_shlib_obj)) \
 
 	$(if $(lib_dir),$(call ln,$$(notdir $$@),$(lib_dir)/$(notdir $(call soname,$1))))
 	$(if $(lib_dir),$(call ln,$$(notdir $$@),$(lib_dir)/$(notdir $(call linker_name,$1))))
+
+# generate the rules for the object files
+$(foreach src,$(call relpath,$(call srcs,$1)),$(call obj_rule,$(src),$(cxx_shlib_obj),-fpic))
 
 $(call reset_attributes,$1)
 endef

@@ -1,6 +1,3 @@
-# include the project specific settings
-include project.mk
-
 # global cxx flags used by all g++ invocations
 CXXFLAGS += -g -Wall -pedantic
 
