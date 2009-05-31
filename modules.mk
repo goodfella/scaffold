@@ -37,7 +37,7 @@ $(call gxx,$(CXXFLAGS) \
            $(CPPFLAGS) \
            $(call cppflags,$2) \
            $(call inc_dirs,$(include_dirs)) \
-           $(call inc_dirs,$(call incdirs,$2)) -c,$(1),$(2))
+           $(call inc_dirs,$(call incdirs,$2)) $3 -c,$(1),$(2))
 endef
 
 
