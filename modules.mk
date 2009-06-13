@@ -87,6 +87,7 @@ endef
 # 3 = extra gcc args
 define obj_rule
 $(call obj_path,$(addsuffix .$2,$(basename $1))): $1
+	@mkdir -p $(call obj_dirpath,$1)
 	$(call make_depends,$$@,$$<)
 	$(call compile_source,$$@,$$<,$3)
 endef
