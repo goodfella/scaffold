@@ -3,12 +3,12 @@
 # this file should be included by the projects top level Makefile.  It
 # defines the default build and clean targets
 
-include $(build_dir)/variables.mk
-include $(build_dir)/attributes.mk
-include $(build_dir)/commands.mk
-include $(build_dir)/functions.mk
-include $(build_dir)/module-helper.mk
-include $(build_dir)/modules.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))variables.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))attributes.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))commands.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))functions.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))module-helper.mk
+include $(dir $(lastword $(MAKEFILE_LIST)))modules.mk
 
 
 # these are variables filled in by the module.mk files

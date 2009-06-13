@@ -16,9 +16,7 @@ lib_dir += lib
 # directory to append to the directory of the object files
 obj_dir := .obj
 
-# set the path to the build directory to include the build system
-build_dir := .
-include $(build_dir)/build.mk
+include build.mk
 
 
 .PHONY: all line-count docs plugin-make plugin module.mk plugins etags sources
