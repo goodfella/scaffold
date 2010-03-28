@@ -33,11 +33,11 @@ endef
 # 3 = extra flags
 define compile_source
 $(call gxx,$(CXXFLAGS) \
-           $(call cxxflags,$2) \
+           $$(call cxxflags,$2) \
            $(CPPFLAGS) \
-           $(call cppflags,$2) \
+           $$(call cppflags,$2) \
            $(call inc_dirs,$(include_dirs)) \
-           $(call inc_dirs,$(call incdirs,$2)) $3 -c,$(1),$(2))
+           $$(call inc_dirs,$$(call incdirs,$2)) $3 -c,$(1),$(2))
 endef
 
 
