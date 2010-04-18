@@ -54,7 +54,9 @@ $(if $($(abbrv)_echo),$($(abbrv)_echo) $(a_$1) \\t $2)
 endef
 
 
-# gcc to compile programs
+# gcc to compile programs.  Note, the trailing end line is required,
+# but right now I don't know why.
+
 # usage
 # 1 = list of arguments
 # 2 = target name
@@ -63,7 +65,18 @@ define gxx
 $(call abbrv_cmd,$0,$(2))
 	$(Q)$(CXX) $(1) -o $2 $3
 
+endef
 
+
+# gcc to compile programs but don't print the command when
+# abbreviations are used
+
+# usage
+# 1 = list of arguments
+# 2 = target name
+# 3 = infiles
+define gxx_noabbrv
+$(Q)$(CXX) $(1) -o $2 $3
 endef
 
 

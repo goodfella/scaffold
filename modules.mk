@@ -46,7 +46,7 @@ endef
 # 1 = target path
 # 2 = infile path
 define make_depends
-$(call gxx,-M -MM -MD -MT $(1) $(include_dirs:%=-I%) \
+$(call gxx_noabbrv,-M -MM -MD -MT $(1) $(include_dirs:%=-I%) \
            $(call cppflags,$2) $(call inc_dirs,$(call incdirs,$2)),\
            $(addsuffix .d,$1),$2)
 endef
