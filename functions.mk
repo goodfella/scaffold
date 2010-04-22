@@ -25,38 +25,6 @@ define link_libs
 $(foreach lib,$1,-l$(lib))
 endef
 
-
-# takes in a list of object file paths and redirects them to there
-# respective obj_dir path if obj_dir is defined.
-
-# 1 = list of object file paths
-define obj_path
-$(if $(obj_dir),$(foreach obj,$(1),$(addsuffix $(notdir $(obj)),$(addsuffix $(obj_dir)/,$(dir $(obj))))), \
-                $(1))
-endef
-
-
-# takes a list of object file paths and outputs the path based on the
-# obj_dir variable
-
-# 1 = list of object file paths
-define obj_dirpath
-$(if $(obj_dir),$(addsuffix $(obj_dir)/,$(dir $(1))),\
-                $(dir $(1)))
-endef
-
-
-# takes in an object file path and outputs the source file path
-
-# 1 = object file path
-# 2 = object file suffix
-# 3 = source file suffix
-define obj_src
-$(if $(obj_dir),$(patsubst %.$(2),%.$3,$(subst $(obj_dir)/,,$1)),\
-                $(patsubst %$(2),%.$3,$1))
-endef
-
-
 # returns the string for linker options i.e. -Wl,<options>.  If an
 # empty string is given, then an empty string is returned
 
