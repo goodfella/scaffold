@@ -57,4 +57,3 @@ typical make variables, i.e. CFLAGS, LDFLAGS ect plus the following:
 
 include_dirs: directories to include for all objects
 bin_dirs: directories to put binaries in
-library_dirs: directories to put librarys in

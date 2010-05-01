@@ -10,9 +10,6 @@ bin_dir += bin
 # the include directories
 include_dirs += .
 
-# the directories to copy all shared libraries to
-lib_dir += lib
-
 # directory to append to the directory of the object files
 obj_dir := .obj
 

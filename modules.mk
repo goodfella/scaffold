@@ -154,7 +154,7 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
                    $(call ldflags,$1) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
-                   $$(call lib_dirs,$$(library_dirs)) \
+                   $(call lib_dirs,$(dir $(call prelibs,$1))) \
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
                    $(call link_opts_string,$(linker_opts)) \
@@ -199,9 +199,7 @@ $(call create_src_var,$(3),cppflags,$(call src_cppflags,$1))
 object_files += $(4)
 cxx_shlibs += $(call real_name,$2)
 clean_files += $(call linker_name,$2) $(call soname,$2)
-lib_dir_files += $(notdir $(call linker_name,$1) $(call soname,$1) $(call real_name,$1))
 sources += $(3)
-library_dirs += $(dir $2)
 
 # library rules
 
@@ -213,6 +211,7 @@ $(call soname,$2): $(call real_name,$2)
 $(call real_name,$2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
 
 	$(call gxx,-shared -Wl$(,)-soname$(,)$(notdir $(call soname,$1)) \
+                   $(foreach prelib,$(call prelibs,$1),-Wl$(,)-rpath$(,)$(dir $(prelib))) \
                    $(CXXFLAGS) \
                    $(call cxxflags,$1) \
                    $(CPPFLAGS) \
@@ -221,8 +220,8 @@ $(call real_name,$2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
                    $(call ldflags,$1) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
-                   $$(call lib_dirs,$$(library_dirs)) \
                    $(call lib_dirs,$(call libdirs,$1)) \
+                   $(call lib_dirs,$(dir $(call prelibs,$1))) \
                    $(call linkopts,$1) \
                    $(call link_opts_string,$(linker_opts)) \
                    $(call link_libs,$(call libs,$1)) \
@@ -231,11 +230,6 @@ $(call real_name,$2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
 
 	$(call ln,$$(notdir $$@),$$(dir $$@)$(notdir $(call soname,$1)))
 	$(call ln,$$(notdir $$@),$$(dir $$@)$(notdir $(call linker_name,$1)))
-
-	$(if $(lib_dir),$(call cp,$$@,$(lib_dir)))
-
-	$(if $(lib_dir),$(call ln,$$(notdir $$@),$(lib_dir)/$(notdir $(call soname,$1))))
-	$(if $(lib_dir),$(call ln,$$(notdir $$@),$(lib_dir)/$(notdir $(call linker_name,$1))))
 
 # generate the rules for the object files
 $(foreach src,$(3),$(call obj_rule,$(src),$(cxx_shlib_obj),))

@@ -39,23 +39,14 @@ modules := $(shell find -name 'module.mk')
 # bin_dir_files: files that are copied into bin_dir.  This variable is
 # used to delete all the files from bin_dir
 
-# lib_dir: directory to copy libraries to
-
-# lib_dir_files: files that are copied into lib_dir.  This variable is
-# used to delete all the files from lib_dir.  Only file names should
-# be added to this variable
-
 # obj_dir: directory to place the object files in.  The path specified
 # here is relative to the object file's source file
-
-# library_dirs: list of directories where the shared libraries for
-# this project are built from
 
 # list of directories with headers
 include_dirs +=
 
 .PHONY: clean-build clean-targets clean-files clean-dirs clean-all \
-        programs libraries make_obj_dirs make_bin_dir make_lib_dir pre_build
+        programs libraries make_obj_dirs make_bin_dir pre_build
 
 ifneq ($(MAKECMDGOALS),clean)
 include $(dependencies)
@@ -71,10 +62,7 @@ make_obj_dirs:
 make_bin_dir:
 	$(if $(bin_dir),@-mkdir -p $(bin_dir))
 
-make_lib_dir:
-	$(if $(lib_dir),@-mkdir -p $(lib_dir))
-
-pre_build: make_obj_dirs make_bin_dir make_lib_dir
+pre_build: make_obj_dirs make_bin_dir
 
 libraries: pre_build $(cxx_shlibs)
 programs: pre_build $(cxx_progs)
@@ -96,9 +84,7 @@ clean-targets:
 # removes the binary directory and the library directory
 clean-dirs:
 	$(if $(bin_dir),rm -f $(addprefix $(bin_dir)/,$(bin_dir_files)))
-	$(if $(lib_dir),rm -f $(addprefix $(lib_dir)/,$(lib_dir_files)))
 	$(if $(bin_dir),-rmdir $(bin_dir))
-	$(if $(lib_dir),-rmdir $(lib_dir))
 
 
 # removes all the files specified in the clean_files variable
