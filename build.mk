@@ -34,11 +34,6 @@ modules := $(shell find -name 'module.mk')
 
 # clean_files: files to delete with the clean-files target
 
-# bin_dir: directory to copy binaries to
-
-# bin_dir_files: files that are copied into bin_dir.  This variable is
-# used to delete all the files from bin_dir
-
 # obj_dir: directory to place the object files in.  The path specified
 # here is relative to the object file's source file
 
@@ -46,7 +41,7 @@ modules := $(shell find -name 'module.mk')
 include_dirs +=
 
 .PHONY: clean-build clean-targets clean-files clean-dirs clean-all \
-        programs libraries make_obj_dirs make_bin_dir pre_build
+        programs libraries make_obj_dirs pre_build
 
 ifneq ($(MAKECMDGOALS),clean)
 include $(dependencies)
@@ -59,10 +54,7 @@ include $(modules)
 make_obj_dirs:
 	$(if $(obj_dir),@mkdir -p $(sort $(dir $(object_files))),)
 
-make_bin_dir:
-	$(if $(bin_dir),@-mkdir -p $(bin_dir))
-
-pre_build: make_obj_dirs make_bin_dir
+pre_build: make_obj_dirs
 
 libraries: pre_build $(cxx_shlibs)
 programs: pre_build $(cxx_progs)
@@ -81,15 +73,9 @@ clean-targets:
 	rm -f $(cxx_progs) $(cxx_shlibs)
 
 
-# removes the binary directory and the library directory
-clean-dirs:
-	$(if $(bin_dir),rm -f $(addprefix $(bin_dir)/,$(bin_dir_files)))
-	$(if $(bin_dir),-rmdir $(bin_dir))
-
-
 # removes all the files specified in the clean_files variable
 clean-files:
 	rm -f $(clean_files)
 
 
-clean-all: clean-build clean-targets clean-dirs clean-files
+clean-all: clean-build clean-targets clean-files

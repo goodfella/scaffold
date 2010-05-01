@@ -136,7 +136,6 @@ $(call create_src_var,$(3),cppflags,$(call src_cppflags,$1))
 
 sources += $(3)
 object_files += $(4)
-bin_dir_files += $(notdir $(1))
 
 
 # rule to create the program.  The dependencies are the object files
@@ -161,8 +160,6 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(notdir $(call prelibs,$1))), \
                    $$@,$$(filter %.$(cxx_prog_obj),$$^))
-
-	$(if $(bin_dir),$(call cp,$2,$(bin_dir)))
 
 # generate the rules for each object file
 $(foreach src,$(3),$(call obj_rule,$(src),$(cxx_prog_obj),))
