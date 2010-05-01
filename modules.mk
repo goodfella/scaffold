@@ -136,7 +136,7 @@ $(call create_src_var,$(3),cppflags,$(call src_cppflags,$1))
 
 sources += $(3)
 object_files += $(4)
-bin_dir_files += $(1)
+bin_dir_files += $(notdir $(1))
 
 
 # rule to create the program.  The dependencies are the object files
