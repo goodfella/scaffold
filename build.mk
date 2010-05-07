@@ -31,6 +31,15 @@ dependencies := $(shell find -name '*.d')
 # module.mk files
 modules := $(shell find -name 'module.mk')
 
+# 1 = module path
+define create_module_targets
+$(eval include $(1))
+$(call process_module)
+endef
+
+
+# create the targets
+$(foreach module,$(modules),$(eval $(call create_module_targets,$(module))))
 
 # clean_files: files to delete with the clean-files target
 
@@ -46,8 +55,6 @@ include_dirs +=
 ifneq ($(MAKECMDGOALS),clean)
 include $(dependencies)
 endif
-
-include $(modules)
 
 libraries: $(cxx_shlibs)
 programs: $(cxx_progs)
