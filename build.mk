@@ -32,11 +32,19 @@ dependencies := $(shell find -name '*.d')
 modules := $(shell find -name 'module.mk')
 
 # 1 = module path
-define create_module_targets
+define create_module_vars
 $(eval include $(1))
-$(call process_module)
+$(call process_module_vars)
 endef
 
+# 1 = module path
+define create_module_targets
+$(eval include $(1))
+$(call process_module_targets)
+endef
+
+# create all the variables associated with the targets
+$(foreach module,$(modules),$(eval $(call create_module_vars,$(module))))
 
 # create the targets
 $(foreach module,$(modules),$(eval $(call create_module_targets,$(module))))

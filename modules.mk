@@ -72,9 +72,18 @@ $(foreach src,$(1),$(call obj_file,$(src),$(2)))
 endef
 
 
+define process_module_vars
+
+# create the rules for the C++ shared libraries
+$(foreach shlib,$(local_cxx_shlibs),$(call cxx_shlib_vars,$(shlib),\
+                                                          $(call relpath,$(shlib))))
+
+$(call reset_module_vars)
+endef
+
 # called from a module.mk file, this sets up the neccessary targets
 # for the objects defined in a module.mk
-define process_module
+define process_module_targets
 
 # creates variables for source attributes
 $(foreach src,$(local_srcs),$(call src_vars,$(src)))
@@ -96,11 +105,7 @@ sources += $(call relpath,$(local_srcs))
 cxx_progs += $(call relpath,$(local_cxx_progs))
 plugins += $(call relpath,$(local_plugs))
 
-# reset module variables
-local_cxx_progs :=
-local_cxx_shlibs :=
-local_srcs :=
-local_plugs :=
+$(call reset_module_vars)
 
 endef
 
@@ -166,6 +171,15 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
 $(foreach src,$(3),$(call obj_rule,$(src),$(cxx_prog_obj),))
 
 $(call reset_attributes,$1)
+endef
+
+# 1 = shared library name
+# 2 = shared library path
+define cxx_shlib_vars
+
+$(1)_dir := $(dir $(2))
+
+
 endef
 
 
