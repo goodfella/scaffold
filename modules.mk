@@ -22,7 +22,7 @@ endef
 
 # 1 = object name
 define prelib_depends
-$(foreach prelib,$(call prelibs,$1),$(call linker_name,$(prelib)))
+$(foreach prelib,$(call prelibs,$1),$(call linker_name,$($(prelib)_dir)$(prelib)))
 endef
 
 
@@ -159,7 +159,7 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
                    $(call ldflags,$1) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
-                   $(call lib_dirs,$(dir $(call prelibs,$1))) \
+                   $(call lib_dirs,$(foreach prelib,$(call prelibs,$1),$($(prelib)_dir))) \
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
                    $(call link_opts_string,$(linker_opts)) \
@@ -223,7 +223,7 @@ $(call soname,$2): $(call real_name,$2)
 $(call real_name,$2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
 
 	$(call gxx,-shared -Wl$(,)-soname$(,)$(notdir $(call soname,$1)) \
-                   $(foreach prelib,$(call prelibs,$1),-Wl$(,)-rpath$(,)$(dir $(prelib))) \
+                   $(foreach prelib,$(call prelibs,$1),-Wl$(,)-rpath$(,)$($(prelib)_dir)) \
                    $(CXXFLAGS) \
                    $(call cxxflags,$1) \
                    $(CPPFLAGS) \
@@ -233,7 +233,7 @@ $(call real_name,$2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
                    $(call lib_dirs,$(call libdirs,$1)) \
-                   $(call lib_dirs,$(dir $(call prelibs,$1))) \
+                   $(call lib_dirs,$(foreach prelib,$(call prelibs,$1),$($(prelib)_dir))) \
                    $(call linkopts,$1) \
                    $(call link_opts_string,$(linker_opts)) \
                    $(call link_libs,$(call libs,$1)) \
