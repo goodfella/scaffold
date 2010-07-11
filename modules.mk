@@ -58,8 +58,7 @@ endef
 # 1 = source file
 # 2 = object file suffix
 define obj_file
-$(if $(obj_dir),$(addsuffix .$(2),$(basename $(dir $(1))$(subst //,/,$(obj_dir)/)$(notdir $(1)))),
-                $(addsuffix .$(2),$(basename $(1))))
+$(addsuffix .$(2),$(basename $(1)))
 endef
 
 # returns a list of object files given a list of full pathed source

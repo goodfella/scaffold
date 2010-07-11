@@ -51,14 +51,11 @@ $(foreach module,$(modules),$(eval $(call create_module_targets,$(module))))
 
 # clean_files: files to delete with the clean-files target
 
-# obj_dir: directory to place the object files in.  The path specified
-# here is relative to the object file's source file
-
 # list of directories with headers
 include_dirs +=
 
 .PHONY: clean-build clean-targets clean-files clean-dirs clean-all \
-        programs libraries make_obj_dirs pre_build
+        programs libraries pre_build
 
 ifneq ($(MAKECMDGOALS),clean)
 include $(dependencies)
@@ -72,9 +69,6 @@ programs: $(cxx_progs)
 # file directories
 clean-build:
 	rm -f $(object_files) $(dependencies)
-
-	$(if $(obj_dir),-rmdir $(sort $(dir $(object_files))))
-
 
 # removes the targets
 clean-targets:
