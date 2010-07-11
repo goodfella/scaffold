@@ -193,15 +193,6 @@ define cxx_shlib_rule
 # check if srcs variable is set
 $(if $(3),,$(error shared library $(1) is missing a $(1)_srcs variable))
 
-# check if version variable is set
-$(if $(call version,$1),,$(error shared library $(1) is missing a $(1)_version variable))
-
-# check if minor variable is set
-$(if $(call minor,$1),,$(error shared library $(1) is missing a $(1)_minor variable))
-
-# check if release variable is set
-$(if $(call release,$1),,$(error shared library $(1) is missing a $(1)_release variable))
-
 # sets the src files cxxflags
 $(call create_src_var,$(3),cxxflags,$(call src_cxxflags,$1))
 
@@ -209,20 +200,15 @@ $(call create_src_var,$(3),cxxflags,$(call src_cxxflags,$1))
 $(call create_src_var,$(3),cppflags,$(call src_cppflags,$1))
 
 object_files += $(4)
-cxx_shlibs += $(call real_name,$2)
-clean_files += $(call linker_name,$2) $(call soname,$2)
+cxx_shlibs += $(call linker_name,$2)
 sources += $(3)
 
 # library rules
 
-$(call linker_name,$2): $(call real_name,$2)
-
-$(call soname,$2): $(call real_name,$2)
-
 # /path/to/lib/lib<library-name>.so: <prelibs> <object files> | <pre_rule>
-$(call real_name,$2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
+$(call linker_name,$2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
 
-	$(call gxx,-shared -Wl$(,)-soname$(,)$(notdir $(call soname,$1)) \
+	$(call gxx,-shared \
                    $(foreach prelib,$(call prelibs,$1),-Wl$(,)-rpath$(,)$($(prelib)_dir)) \
                    $(CXXFLAGS) \
                    $(call cxxflags,$1) \
@@ -239,9 +225,6 @@ $(call real_name,$2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(notdir $(call prelibs,$1))), \
                    $$@,$$(filter %.$(cxx_shlib_obj),$$^))
-
-	$(call ln,$$(notdir $$@),$$(dir $$@)$(notdir $(call soname,$1)))
-	$(call ln,$$(notdir $$@),$$(dir $$@)$(notdir $(call linker_name,$1)))
 
 # generate the rules for the object files
 $(foreach src,$(3),$(call obj_rule,$(src),$(cxx_shlib_obj),))
