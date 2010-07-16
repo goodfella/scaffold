@@ -91,10 +91,6 @@ $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
                                                        $(call relpath,$(call srcs,$(prog))),\
                                                        $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(obj_file_suffix))))
 
-sources += $(call relpath,$(local_srcs))
-cxx_progs += $(call relpath,$(local_cxx_progs))
-plugins += $(call relpath,$(local_plugs))
-
 $(call reset_module_vars)
 
 endef
@@ -128,6 +124,7 @@ $(2): target_cppflags := $(call src_cppflags,$1)
 $(2): target_cxxflags := $(call src_cxxflags,$1)
 
 sources += $(3)
+cxx_progs += $(call relpath,$(local_cxx_progs))
 object_files += $(4)
 
 
