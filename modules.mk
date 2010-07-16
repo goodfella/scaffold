@@ -81,7 +81,7 @@ $(foreach src,$(local_srcs),$(call src_vars,$(src),\
 
 # create the rules for the C++ shared libraries
 $(foreach shlib,$(local_cxx_shlibs),$(call cxx_shlib_rule,$(shlib),\
-                                                          $(call relpath,$(shlib)),\
+                                                          $(call linker_name,$(call relpath,$(shlib))),\
                                                           $(call relpath,$(call srcs,$(shlib))),\
                                                           $(call obj_files,$(call relpath,$(call srcs,$(shlib))),$(obj_file_suffix))))
 
@@ -172,7 +172,7 @@ endef
 
 # rule to create C++ shared libraries.
 # 1 = shared library name
-# 2 = shared library path
+# 2 = shared library linker name path
 # 3 = full pathed sources
 # 4 = full pathed object files
 define cxx_shlib_rule
@@ -181,18 +181,18 @@ define cxx_shlib_rule
 $(if $(3),,$(error shared library $(1) is missing a $(1)_srcs variable))
 
 # target specific variables for cppflags and cxxflags
-$(call linker_name,$2): target_cppflags := $(call src_cppflags,$1)
-$(call linker_name,$2): target_cxxflags := $(call src_cxxflags,$1)
+$(2): target_cppflags := $(call src_cppflags,$1)
+$(2): target_cxxflags := $(call src_cxxflags,$1)
 
 
 object_files += $(4)
-cxx_shlibs += $(call linker_name,$2)
+cxx_shlibs += $(2)
 sources += $(3)
 
 # library rules
 
 # /path/to/lib/lib<library-name>.so: <prelibs> <object files> | <pre_rule>
-$(call linker_name,$2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
+$(2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
 
 	$(call gxx,-shared \
                    $(foreach prelib,$(call prelibs,$1),-Wl$(,)-rpath$(,)$($(prelib)_dir)) \
