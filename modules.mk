@@ -141,12 +141,12 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
                    $(call cppflags,$1) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
-                   $(call lib_dirs,$(foreach prelib,$(call prelibs,$1),$($(prelib)_dir))) \
+                   $(call lib_dirs,$(foreach prelib,$(call prelibs,$(1)),$(call $(prelib)-prelib-dirs))) \
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
                    $(call link_opts_string,$(linker_opts)) \
                    $(call link_libs,$(call libs,$1)) \
-                   $(call link_libs,$(notdir $(call prelibs,$1))), \
+                   $(call link_libs,$(foreach prelib,$(call prelibs,$(1)),$(call $(prelib)-prelibs))), \
                    $$@,$$(filter %.$(obj_file_suffix),$$^))
 
 # generate the rules for each object file
@@ -162,10 +162,22 @@ define cxx_shlib_vars
 $(1)_dir := $(dir $(2))
 
 
+# generates the prelibs recursively
+define $(1)-prelibs
+$(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)-prelibs)) $(1)
+endef
+
+# generates the prelib directories recursively
+define $(1)-prelib-dirs
+$(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)-prelib-dirs)) $(dir $(2))
+endef
+
+
 endef
 
 
 # rule to create C++ shared libraries.
+
 # 1 = shared library name
 # 2 = shared library linker name path
 # 3 = full pathed sources
@@ -190,7 +202,6 @@ sources += $(3)
 $(2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
 
 	$(call gxx,-shared \
-                   $(foreach prelib,$(call prelibs,$1),-Wl$(,)-rpath$(,)$($(prelib)_dir)) \
                    $(CXXFLAGS) \
                    $(call cxxflags,$1) \
                    $(CPPFLAGS) \
@@ -202,7 +213,7 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
                    $(call linkopts,$1) \
                    $(call link_opts_string,$(linker_opts)) \
                    $(call link_libs,$(call libs,$1)) \
-                   $(call link_libs,$(notdir $(call prelibs,$1))), \
+                   $(call link_libs,$(call prelibs,$1)), \
                    $$@,$$(filter %.$(obj_file_suffix),$$^))
 
 # generate the rules for the object files
