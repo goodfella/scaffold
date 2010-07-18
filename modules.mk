@@ -124,7 +124,7 @@ $(2): target_cppflags := $(call src_cppflags,$1)
 $(2): target_cxxflags := $(call src_cxxflags,$1)
 
 sources += $(3)
-cxx_progs += $(call relpath,$(local_cxx_progs))
+cxx_progs += $(2)
 object_files += $(4)
 
 
@@ -139,8 +139,6 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
                    $(call cxxflags,$1) \
                    $(CPPFLAGS) \
                    $(call cppflags,$1) \
-                   $(LDFLAGS) \
-                   $(call ldflags,$1) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
                    $(call lib_dirs,$(foreach prelib,$(call prelibs,$1),$($(prelib)_dir))) \
@@ -197,8 +195,6 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
                    $(call cxxflags,$1) \
                    $(CPPFLAGS) \
                    $(call cppflags,$1) \
-                   $(LDFLAGS) \
-                   $(call ldflags,$1) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
                    $(call lib_dirs,$(call libdirs,$1)) \
@@ -210,7 +206,7 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
                    $$@,$$(filter %.$(obj_file_suffix),$$^))
 
 # generate the rules for the object files
-$(foreach src,$(3),$(call obj_rule,$(src),$(obj_file_suffix),))
+$(foreach src,$(3),$(call obj_rule,$(src),$(obj_file_suffix),-fPIC))
 
 $(call reset_attributes,$1)
 endef
