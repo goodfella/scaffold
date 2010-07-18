@@ -61,17 +61,18 @@ $(foreach src,$(1),$(call obj_file,$(src),$(2)))
 endef
 
 
+# create the rules for the C++ shared libraries
 define process_module_vars
 
-# create the rules for the C++ shared libraries
-$(foreach shlib,$(local_cxx_shlibs),$(call cxx_shlib_vars,$(shlib),\
-                                                          $(call relpath,$(shlib))))
+$(foreach shlib,$(local_cxx_shlibs),$(call lib_vars,$(shlib),\
+                                                    $(call relpath,$(shlib))))
 
 $(call reset_module_vars)
 endef
 
-# called from a module.mk file, this sets up the neccessary targets
-# for the objects defined in a module.mk
+
+# sets up the neccessary targets for the objects defined in a
+# module.mk
 define process_module_targets
 
 # creates variables for source attributes
@@ -155,9 +156,13 @@ $(foreach src,$(3),$(call obj_rule,$(src),$(obj_file_suffix),))
 $(call reset_attributes,$1)
 endef
 
+
+# Creates the variables associated with a lib that are used by
+# programs that need the lib
+
 # 1 = shared library name
 # 2 = shared library path
-define cxx_shlib_vars
+define lib_vars
 
 $(1)_dir := $(dir $(2))
 
