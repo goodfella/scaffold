@@ -59,11 +59,12 @@ endef
 
 # usage
 # 1 = list of arguments
-# 2 = target name
-# 3 = infiles
+# 2 = libraries
+# 3 = target name
+# 4 = infiles
 define gxx
-$(call abbrv_cmd,$0,$(2))
-	$(Q)$(CXX) $(1) -o $2 $3
+$(call abbrv_cmd,$0,$(3))
+	$(Q)$(CXX) $(1) $4 $2 -o $3
 
 endef
 
@@ -73,10 +74,11 @@ endef
 
 # usage
 # 1 = list of arguments
-# 2 = target name
-# 3 = infiles
+# 2 = libraries
+# 3 = target name
+# 4 = infiles
 define gxx_noabbrv
-$(Q)$(CXX) $(1) -o $2 $3
+$(Q)$(CXX) $(1) $4 $2 -o $3
 endef
 
 

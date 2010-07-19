@@ -27,7 +27,7 @@ $(call gxx,$(CXXFLAGS) \
            $$(_src_cppflags) \
            $$(target_cppflags) \
            $(call inc_dirs,$(include_dirs)) \
-           $$(call inc_dirs,$$(src_incdirs)) $3 -c,$(1),$(2))
+           $$(call inc_dirs,$$(src_incdirs)) $3 -c,,$(1),$(2))
 endef
 
 
@@ -37,7 +37,7 @@ endef
 # 2 = infile path
 define make_depends
 $(call gxx_noabbrv,-M -MM -MD -MT $(1) $(include_dirs:%=-I%) \
-           $(call cppflags,$2) $(call inc_dirs,$(call incdirs,$2)),\
+           $(call cppflags,$2) $(call inc_dirs,$(call incdirs,$2)),,\
            $(addsuffix .d,$1),$2)
 
 endef
@@ -58,6 +58,16 @@ endef
 # 2 = object file suffix
 define obj_files
 $(foreach src,$(1),$(call obj_file,$(src),$(2)))
+endef
+
+
+
+# returns a list of data associated with prelibs
+
+# 1 = list of prelibs
+# 2 = prelib data to get i.e. (prelibs, prelib-dirs)
+define prelib_info
+$(foreach prelib,$(1),$(call $(prelib)-$(2)))
 endef
 
 
@@ -142,12 +152,12 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
                    $(call cppflags,$1) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
-                   $(call lib_dirs,$(foreach prelib,$(call prelibs,$(1)),$(call $(prelib)-prelib-dirs))) \
+                   $(call lib_dirs,$(call prelib_info,$(call prelibs,$(1)),prelib-dirs)) \
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
-                   $(call link_opts_string,$(linker_opts)) \
+                   $(call link_opts_string,$(linker_opts)), \
                    $(call link_libs,$(call libs,$1)) \
-                   $(call link_libs,$(foreach prelib,$(call prelibs,$(1)),$(call $(prelib)-prelibs))), \
+                   $(call link_libs,$(call prelib_info,$(call prelibs,$(1)),prelibs)), \
                    $$@,$$(filter %.$(obj_file_suffix),$$^))
 
 # generate the rules for each object file
@@ -169,12 +179,12 @@ $(1)_dir := $(dir $(2))
 
 # generates the prelibs recursively
 define $(1)-prelibs
-$(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)-prelibs)) $(1)
+$(1) $(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)-prelibs))
 endef
 
 # generates the prelib directories recursively
 define $(1)-prelib-dirs
-$(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)-prelib-dirs)) $(dir $(2))
+$(dir $(2)) $(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)-prelib-dirs))
 endef
 
 
@@ -216,7 +226,7 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call lib_dirs,$(foreach prelib,$(call prelibs,$1),$($(prelib)_dir))) \
                    $(call linkopts,$1) \
-                   $(call link_opts_string,$(linker_opts)) \
+                   $(call link_opts_string,$(linker_opts)), \
                    $(call link_libs,$(call libs,$1)) \
                    $(call link_libs,$(call prelibs,$1)), \
                    $$@,$$(filter %.$(obj_file_suffix),$$^))
