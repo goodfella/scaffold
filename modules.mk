@@ -8,6 +8,24 @@ $(dir $1)lib$(notdir $1).so
 endef
 
 
+# returns the soname of a shared library
+
+# 1 = library name
+# 2 = linker name
+define soname
+$(addsuffix .$(call version,$(1)),$(2))
+endef
+
+
+# returns the real name of a shared library
+
+# 1 = library name
+# 2 = linker name
+define realname
+$(addsuffix $(if $(call release,$(1)),.$(call release,$(1)),),$(addsuffix .$(call minor,$(1)),$(addsuffix .$(call version,$(1)),$(2))))
+endef
+
+
 # 1 = object name
 define prelib_depends
 $(foreach prelib,$(call prelibs,$1),$(call linker_name,$($(prelib)_dir)$(prelib)))
@@ -30,6 +48,36 @@ $(call gxx,$(CXXFLAGS) \
            $$(call inc_dirs,$$(src_incdirs)) $3 -c,,$(1),$(2))
 endef
 
+
+# compiles a shared library
+
+# 1 = name of shared library
+# 2 = soname of library
+define compile_cxx_shlib
+$(call gxx,-shared $(if $(2),-Wl$(,)-soname$(,)$(2)) \
+           $(CXXFLAGS) \
+           $(call cxxflags,$1) \
+           $(CPPFLAGS) \
+           $(call cppflags,$1) \
+           $(call inc_dirs,$(include_dirs)) \
+           $(call inc_dirs,$(call incdirs,$1)) \
+           $(call lib_dirs,$(call libdirs,$1)) \
+           $(call lib_dirs,$(foreach prelib,$(call prelibs,$1),$($(prelib)_dir))) \
+           $(call linkopts,$1) \
+           $(call link_opts_string,$(linker_opts)), \
+           $(call link_libs,$(call libs,$1)) \
+           $(call link_libs,$(call prelibs,$1)), \
+           $$@,$$(filter %.$(obj_file_suffix),$$^))
+endef
+
+
+# creates a soft link for a shared library
+
+# 1 = link path
+# 2 = target
+define link_shlib
+$(call ln,$$(notdir $$<),$$(@))
+endef
 
 # creates the depends file for an object file
 
@@ -213,23 +261,49 @@ sources += $(3)
 
 # library rules
 
-# /path/to/lib/lib<library-name>.so: <prelibs> <object files> | <pre_rule>
-$(2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
+ifneq ($(call version,$(1)),)
 
-	$(call gxx,-shared \
-                   $(CXXFLAGS) \
-                   $(call cxxflags,$1) \
-                   $(CPPFLAGS) \
-                   $(call cppflags,$1) \
-                   $(call inc_dirs,$(include_dirs)) \
-                   $(call inc_dirs,$(call incdirs,$1)) \
-                   $(call lib_dirs,$(call libdirs,$1)) \
-                   $(call lib_dirs,$(foreach prelib,$(call prelibs,$1),$($(prelib)_dir))) \
-                   $(call linkopts,$1) \
-                   $(call link_opts_string,$(linker_opts)), \
-                   $(call link_libs,$(call libs,$1)) \
-                   $(call link_libs,$(call prelibs,$1)), \
-                   $$@,$$(filter %.$(obj_file_suffix),$$^))
+# we have a version number and a minor number, so the linker name depends on the
+# soname and the soname depends on the real name
+ifneq ($(call minor,$(1)),)
+
+shlib_clean += $(call soname,$(1),$(2)) $(call realname,$(1),$(2))
+
+$(2): $(call soname,$(1),$(2))
+	$(call link_shlib)
+
+$(call soname,$(1),$(2)): $(call realname,$(1),$(2))
+	$(call link_shlib)
+
+# /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
+$(call realname,$(1),$(2)): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
+	$(call compile_cxx_shlib,$(1),$(call soname,$(1),$(notdir $(2))))
+
+
+# we have a version number without a minor number, so the linker name
+# depends on a soname
+else
+
+shlib_clean += $(call soname,$(1),$(2))
+
+$(2): $(call soname,$(1),$(2))
+	$(call link_shlib)
+
+# /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
+$(call soname,$(1),$(2)): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
+	$(call compile_cxx_shlib,$(1),$(call soname,$(1),$(notdir $(2))))
+
+endif
+
+# no version just build linker name
+else
+
+# /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
+$(2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
+	$(call compile_cxx_shlib,$(1),)
+
+endif
+
 
 # generate the rules for the object files
 $(foreach src,$(3),$(call obj_rule,$(src),$(obj_file_suffix),-fPIC))

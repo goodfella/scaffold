@@ -99,6 +99,6 @@ endef
 # 1 = source file path
 # 2 = symlink path
 define ln
-$(call abbrv_cmd,$0,$1 "->" $2)
+$(call abbrv_cmd,$0,$2 "->" $1)
 	$(Q)ln -snf $1 $2
 endef

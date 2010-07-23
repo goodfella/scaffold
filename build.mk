@@ -54,8 +54,8 @@ $(foreach module,$(modules),$(eval $(call create_module_targets,$(module))))
 # list of directories with headers
 include_dirs +=
 
-.PHONY: clean-build clean-targets clean-files clean-dirs clean-all \
-        programs libraries pre_build
+.PHONY: clean-build clean-targets clean-files clean-all programs libraries
+
 
 ifneq ($(MAKECMDGOALS),clean)
 include $(dependencies)
@@ -72,7 +72,7 @@ clean-build:
 
 # removes the targets
 clean-targets:
-	rm -f $(cxx_progs) $(cxx_shlibs)
+	rm -f $(cxx_progs) $(cxx_shlibs) $(shlib_clean)
 
 
 # removes all the files specified in the clean_files variable
