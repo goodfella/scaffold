@@ -26,9 +26,11 @@ $(addsuffix $(if $(call release,$(1)),.$(call release,$(1)),),$(addsuffix .$(cal
 endef
 
 
+# generates the prelibs for a given object
+
 # 1 = object name
 define prelib_depends
-$(foreach prelib,$(call prelibs,$1),$(call linker_name,$($(prelib)_dir)$(prelib)))
+$(foreach prelib,$(call prelibs,$1),$($(prelib)_target))
 endef
 
 
@@ -49,7 +51,7 @@ $(call gxx,$(CXXFLAGS) \
 endef
 
 
-# compiles a shared library
+# gxx command for a shared library
 
 # 1 = name of shared library
 # 2 = soname of library
@@ -99,6 +101,7 @@ define obj_file
 $(addsuffix .$(2),$(basename $(1)))
 endef
 
+
 # returns a list of object files given a list of full pathed source
 # files
 
@@ -107,7 +110,6 @@ endef
 define obj_files
 $(foreach src,$(1),$(call obj_file,$(src),$(2)))
 endef
-
 
 
 # returns a list of data associated with prelibs
@@ -123,7 +125,8 @@ endef
 define process_module_vars
 
 $(foreach shlib,$(local_cxx_shlibs),$(call lib_vars,$(shlib),\
-                                                    $(call relpath,$(shlib))))
+                                                    $(call relpath,$(shlib)),\
+                                                    $(call linker_name,$(call relpath,$(shlib)))))
 
 $(call reset_module_vars)
 endef
@@ -215,15 +218,21 @@ $(call reset_attributes,$1)
 endef
 
 
-# Creates the variables associated with a lib that are used by
-# programs that need the lib
+# Creates the variables associated with a library that are used by
+# programs and other libraries that need them.
 
-# 1 = shared library name
-# 2 = shared library path
+# 1 = library name
+# 2 = library path
+# 3 = library target name
 define lib_vars
 
+# used by programs to get the directory which contains the library
 $(1)_dir := $(dir $(2))
 
+# used by programs and other libraries to list the necessary
+# prerequisites such that the library builds before the targets that
+# require it
+$(1)_target := $(3)
 
 # generates the prelibs recursively
 define $(1)-prelibs
