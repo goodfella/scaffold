@@ -77,7 +77,6 @@ clean-targets:
 
 # removes all the files specified in the clean_files variable
 clean-files:
-	rm -f $(clean_files)
-
+	$(if $(clean_files),rm -f $(clean_files),)
 
 clean-all: clean-build clean-targets clean-files
