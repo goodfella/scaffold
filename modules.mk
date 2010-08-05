@@ -30,7 +30,7 @@ endef
 
 # 1 = object name
 define prelib_depends
-$(foreach prelib,$(call prelibs,$1),$($(prelib)_target))
+$(foreach prelib,$(call prelibs,$1),$(dollar)$$($(prelib)_target))
 endef
 
 
@@ -47,7 +47,7 @@ $(call gxx,$(CXXFLAGS) \
            $$(_src_cppflags) \
            $$(target_cppflags) \
            $(call inc_dirs,$(include_dirs)) \
-           $$(call inc_dirs,$$(src_incdirs)) $3 -c,,$(1),$(2))
+           $$(call inc_dirs,$$(_src_incdirs)) $3 -c,,$(1),$(2))
 endef
 
 
@@ -64,7 +64,7 @@ $(call gxx,-shared $(if $(2),-Wl$(,)-soname$(,)$(2)) \
            $(call inc_dirs,$(include_dirs)) \
            $(call inc_dirs,$(call incdirs,$1)) \
            $(call lib_dirs,$(call libdirs,$1)) \
-           $(call lib_dirs,$(foreach prelib,$(call prelibs,$1),$($(prelib)_dir))) \
+           $(call lib_dirs,$(foreach prelib,$(call prelibs,$1),$$($(prelib)_dir))) \
            $(call linkopts,$1) \
            $(call link_opts_string,$(linker_opts)), \
            $(call link_libs,$(call libs,$1)) \
@@ -117,18 +117,7 @@ endef
 # 1 = list of prelibs
 # 2 = prelib data to get i.e. (prelibs, prelib-dirs)
 define prelib_info
-$(foreach prelib,$(1),$(call $(prelib)-$(2)))
-endef
-
-
-# create the rules for the C++ shared libraries
-define process_module_vars
-
-$(foreach shlib,$(local_cxx_shlibs),$(call lib_vars,$(shlib),\
-                                                    $(call relpath,$(shlib)),\
-                                                    $(call linker_name,$(call relpath,$(shlib)))))
-
-$(call reset_module_vars)
+$(foreach prelib,$(1),$(call $(prelib)_$(2)))
 endef
 
 
@@ -203,48 +192,18 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
                    $(call cppflags,$1) \
                    $(call inc_dirs,$(include_dirs)) \
                    $(call inc_dirs,$(call incdirs,$1)) \
-                   $(call lib_dirs,$(call prelib_info,$(call prelibs,$(1)),prelib-dirs)) \
+                   $$(call lib_dirs,$$(call prelib_info,$(call prelibs,$(1)),gen_prelib_dirs)) \
                    $(call lib_dirs,$(call libdirs,$1)) \
                    $(call linkopts,$1) \
                    $(call link_opts_string,$(linker_opts)), \
                    $(call link_libs,$(call libs,$1)) \
-                   $(call link_libs,$(call prelib_info,$(call prelibs,$(1)),prelibs)), \
+                   $$(call link_libs,$$(call prelib_info,$(call prelibs,$(1)),gen_prelibs)), \
                    $$@,$$(filter %.$(obj_file_suffix),$$^))
 
 # generate the rules for each object file
 $(foreach src,$(3),$(call obj_rule,$(src),$(obj_file_suffix),))
 
 $(call reset_attributes,$1)
-endef
-
-
-# Creates the variables associated with a library that are used by
-# programs and other libraries that need them.
-
-# 1 = library name
-# 2 = library path
-# 3 = library target name
-define lib_vars
-
-# used by programs to get the directory which contains the library
-$(1)_dir := $(dir $(2))
-
-# used by programs and other libraries to list the necessary
-# prerequisites such that the library builds before the targets that
-# require it
-$(1)_target := $(3)
-
-# generates the prelibs recursively
-define $(1)-prelibs
-$(1) $(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)-prelibs))
-endef
-
-# generates the prelib directories recursively
-define $(1)-prelib-dirs
-$(dir $(2)) $(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)-prelib-dirs))
-endef
-
-
 endef
 
 
@@ -267,6 +226,25 @@ $(2): target_cxxflags := $(call src_cxxflags,$1)
 object_files += $(4)
 cxx_shlibs += $(2)
 sources += $(3)
+
+# used by programs to get the directory which contains the library
+$(1)_dir := $(dir $(2))
+
+# used by programs and other libraries to list the necessary
+# prerequisites such that the library builds before the targets that
+# require it
+$(1)_target := $(2)
+
+# generates the prelibs recursively
+define $(1)_gen_prelibs
+$(1) $(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)_gen_prelibs))
+endef
+
+# generates the prelib directories recursively
+define $(1)_gen_prelib_dirs
+$(dir $(2)) $(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)_gen_prelib_dirs))
+endef
+
 
 # library rules
 
@@ -332,6 +310,6 @@ define src_vars
 # match the target specific variable names
 $(2): _src_cxxflags := $(call cxxflags,$1)
 $(2): _src_cppflags := $(call cppflags,$1)
-$(2): src_incdirs := $(call incdirs,$1)
+$(2): _src_incdirs := $(call incdirs,$1)
 $(call reset_attributes,$1)
 endef

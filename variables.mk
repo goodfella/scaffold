@@ -9,3 +9,4 @@ semi_colon := ;
 # this enables us to put commas in variables
 , := ,
 
+dollar = $$
