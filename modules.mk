@@ -34,21 +34,6 @@ $(foreach prelib,$(call prelibs,$1),$(dollar)$$($(prelib)_target))
 endef
 
 
-# compiles a single source file into an object file
-
-# 1 = path of object file
-# 2 = path of source file
-# 3 = extra flags
-define compile_source
-$(call gxx,$(CFLAGS) \
-           $$(PREREQ_CFLAGS) \
-           $$(SRC_CFLAGS) \
-           $(call inc_dirs,$(include_dirs)) \
-           $$(call inc_dirs,$$(PREREQ_INCDIRS)) \
-           $$(call inc_dirs,$$(SRC_INCDIRS)) $3 -c,,$(1),$(2))
-endef
-
-
 # gxx command for a shared library
 
 # 1 = name of shared library
@@ -70,21 +55,6 @@ endef
 # 2 = target
 define link_shlib
 $(call ln,$$(notdir $$<),$$(@))
-endef
-
-# creates the depends file for an object file
-
-# 1 = target path
-# 2 = infile path
-define make_depends
-$(call gxx_noabbrv,-M -MM -MD -MT $(1) \
-           $$(PREREQ_CPPFLAGS) \
-           $$(SRC_CPPFLAGS) \
-           $(include_dirs:%=-I%) \
-           $$(PREREQ_INCDIRS:%=-I%) \
-           $$(SRC_INCDIRS:%=-I%),, \
-           $(addsuffix .d,$1),$2)
-
 endef
 
 
@@ -166,8 +136,21 @@ endef
 # 3 = extra gcc args
 define obj_rule
 $(call obj_file,$(1),$(2)) : $1
-	$(call make_depends,$$@,$$<)
-	$(call compile_source,$$@,$$<,$3)
+	$(call gxx_noabbrv,-M -MM -MD -MT $$@ \
+                          $$(PREREQ_CPPFLAGS) \
+                          $$(SRC_CPPFLAGS) \
+                          $(include_dirs:%=-I%) \
+                          $$(PREREQ_INCDIRS:%=-I%) \
+                          $$(SRC_INCDIRS:%=-I%),, \
+                          $(addsuffix .d,$$@),$1)
+
+	$(call gxx,$(CFLAGS) \
+                   $$(PREREQ_CFLAGS) \
+                   $$(SRC_CFLAGS) \
+                   $(call inc_dirs,$(include_dirs)) \
+                   $$(call inc_dirs,$$(PREREQ_INCDIRS)) \
+                   $$(call inc_dirs,$$(SRC_INCDIRS)) $3 -c,,$$@,$1)
+
 endef
 
 
