@@ -35,23 +35,10 @@ define attribute
 $($(1)_$(2))
 endef
 
-# global attributes apply to all objects
-
-
 # compiled object attributes
 
-# flags for C compiler
-define ccflags
-$(call attribute,$1,$0)
-endef
-
-# flags for C++ compiler
-define cxxflags
-$(call attribute,$1,$0)
-endef
-
-# C preprocessor flags
-define cppflags
+# flags for compiler
+define cflags
 $(call attribute,$1,$0)
 endef
 
@@ -60,23 +47,10 @@ define incdirs
 $(call attribute,$1,$0)
 endef
 
-
-# target attributes
-
 # libraries that need to be built before the target that the target
 # links against
 define prelibs
 $(call attribute,$1,$0)
-endef
-
-# linker options for gcc -rdynamic, -shared etc.
-define ldflags
-$(call attribute,$1,$0)
-endef
-
-# comma deliminated list of options to pass to linker
-define linkopts
-$(call link_opts_string,$(call attribute,$1,$0))
 endef
 
 # directories to find libraries in -L
@@ -94,19 +68,17 @@ define srcs
 $(call attribute,$1,$0)
 endef
 
-# source cxxflags to apply to all sources specified in the srcs
+# source compiler to apply to all sources specified in the srcs
 # attribute
-define src_cxxflags
+define src_cflags
 $(call attribute,$1,$0)
 endef
 
-
-# source cppflags to apply to all sources specified in the srcs
+# source incdirs to apply to all sources specified in the srcs
 # attribute
-define src_cppflags
+define src_incdirs
 $(call attribute,$1,$0)
 endef
-
 
 # the following three attributes are for shared libraries and are used
 # to specify the version information
@@ -141,18 +113,13 @@ endef
 
 # 1 = object
 define reset_attributes
-$(1)_ccflags :=
-$(1)_cxxflags :=
-$(1)_cppflags :=
+$(1)_cflags :=
 $(1)_incdirs :=
-$(1)_ldflags :=
 $(1)_prelibs :=
-$(1)_linkopts :=
 $(1)_libdirs :=
 $(1)_libs :=
 $(1)_srcs :=
-$(1)_src_cxxflags :=
-$(1)_src_cppflags :=
+$(1)_src_cflags :=
 $(1)_version :=
 $(1)_minor :=
 $(1)_release :=

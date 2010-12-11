@@ -40,14 +40,12 @@ endef
 # 2 = path of source file
 # 3 = extra flags
 define compile_source
-$(call gxx,$(CXXFLAGS) \
-           $$(_src_cxxflags) \
-           $$(target_cxxflags) \
-           $(CPPFLAGS) \
-           $$(_src_cppflags) \
-           $$(target_cppflags) \
+$(call gxx,$(CFLAGS) \
+           $$(PREREQ_CFLAGS) \
+           $$(SRC_CFLAGS) \
            $(call inc_dirs,$(include_dirs)) \
-           $$(call inc_dirs,$$(_src_incdirs)) $3 -c,,$(1),$(2))
+           $$(call inc_dirs,$$(PREREQ_INCDIRS)) \
+           $$(call inc_dirs,$$(SRC_INCDIRS)) $3 -c,,$(1),$(2))
 endef
 
 
@@ -57,18 +55,11 @@ endef
 # 2 = soname of library
 define compile_cxx_shlib
 $(call gxx,-shared $(if $(2),-Wl$(,)-soname$(,)$(2)) \
-           $(CXXFLAGS) \
-           $(call cxxflags,$1) \
-           $(CPPFLAGS) \
-           $(call cppflags,$1) \
-           $(call inc_dirs,$(include_dirs)) \
-           $(call inc_dirs,$(call incdirs,$1)) \
-           $(call lib_dirs,$(call libdirs,$1)) \
-           $(call lib_dirs,$(foreach prelib,$(call prelibs,$1),$$($(prelib)_dir))) \
-           $(call linkopts,$1) \
-           $(call link_opts_string,$(linker_opts)), \
-           $(call link_libs,$(call libs,$1)) \
-           $(call link_libs,$(call prelibs,$1)), \
+           $(CFLAGS) \
+           $$(TARGET_CFLAGS) \
+           $$(call lib_dirs,$$(TARGET_LIBDIRS)) \
+           $$(call lib_dirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)), \
+           $$(call link_libs,$$(TARGET_LIBS) $$(TARGET_PRELIBS)), \
            $$@,$$(filter %.$(obj_file_suffix),$$^))
 endef
 
@@ -86,8 +77,12 @@ endef
 # 1 = target path
 # 2 = infile path
 define make_depends
-$(call gxx_noabbrv,-M -MM -MD -MT $(1) $(include_dirs:%=-I%) \
-           $(call cppflags,$2) $(call inc_dirs,$(call incdirs,$2)),,\
+$(call gxx_noabbrv,-M -MM -MD -MT $(1) \
+           $$(PREREQ_CPPFLAGS) \
+           $$(SRC_CPPFLAGS) \
+           $(include_dirs:%=-I%) \
+           $$(PREREQ_INCDIRS:%=-I%) \
+           $$(SRC_INCDIRS:%=-I%),, \
            $(addsuffix .d,$1),$2)
 
 endef
@@ -118,6 +113,23 @@ endef
 # 2 = prelib data to get i.e. (prelibs, prelib-dirs)
 define prelib_info
 $(foreach prelib,$(1),$(call $(prelib)_$(2)))
+endef
+
+
+# creates the target specific variables for all targets
+
+# 1 = target name
+# 2 = target path
+define create_target_vars
+
+$(2): TARGET_CFLAGS := $(call cflags,$1)
+$(2): PREREQ_INCDIRS := $(call src_incdirs,$1)
+$(2): PREREQ_CFLAGS := $(call src_cflags,$1)
+$(2): PREREQ_CPPFLAGS := $(filter -D%,$(call src_cflags,$1))
+$(2): TARGET_LIBDIRS := $(call libdirs,$1)
+$(2): TARGET_LIBS := $(call libs,$1)
+$(2): TARGET_PRELIBS := $(call prelibs,$1)
+
 endef
 
 
@@ -159,6 +171,7 @@ $(call obj_file,$(1),$(2)) : $1
 endef
 
 
+
 # creates the rule for a C++ program
 
 # 1 = program name
@@ -170,9 +183,7 @@ define cxx_prog_rule
 # checks to make sure a srcs variable is declared
 $(if $(3),,$(error program $(1) is missing a $(1)_srcs variable))
 
-# target specific variable for src_cppflags and src_cxxflags
-$(2): target_cppflags := $(call src_cppflags,$1)
-$(2): target_cxxflags := $(call src_cxxflags,$1)
+$(call create_target_vars,$(1),$(2))
 
 sources += $(3)
 cxx_progs += $(2)
@@ -186,18 +197,12 @@ object_files += $(4)
 # /path/to/program : <prelibs> <object files> | <pre-rules>
 $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
 
-	$(call gxx,$(CXXFLAGS) \
-                   $(call cxxflags,$1) \
-                   $(CPPFLAGS) \
-                   $(call cppflags,$1) \
-                   $(call inc_dirs,$(include_dirs)) \
-                   $(call inc_dirs,$(call incdirs,$1)) \
-                   $$(call lib_dirs,$$(call prelib_info,$(call prelibs,$(1)),gen_prelib_dirs)) \
-                   $(call lib_dirs,$(call libdirs,$1)) \
-                   $(call linkopts,$1) \
-                   $(call link_opts_string,$(linker_opts)), \
-                   $(call link_libs,$(call libs,$1)) \
-                   $$(call link_libs,$$(call prelib_info,$(call prelibs,$(1)),gen_prelibs)), \
+	$(call gxx,$(CFLAGS) \
+                   $$(TARGET_CFLAGS) \
+                   $$(call lib_dirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)) \
+                   $$(call lib_dirs,$$(TARGET_LIBDIRS)), \
+                   $$(call link_libs,$$(TARGET_LIBS)) \
+                   $$(call link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)), \
                    $$@,$$(filter %.$(obj_file_suffix),$$^))
 
 # generate the rules for each object file
@@ -218,10 +223,7 @@ define cxx_shlib_rule
 # check if srcs variable is set
 $(if $(3),,$(error shared library $(1) is missing a $(1)_srcs variable))
 
-# target specific variables for cppflags and cxxflags
-$(2): target_cppflags := $(call src_cppflags,$1)
-$(2): target_cxxflags := $(call src_cxxflags,$1)
-
+$(call create_target_vars,$(1),$(2))
 
 object_files += $(4)
 cxx_shlibs += $(2)
@@ -305,11 +307,9 @@ endef
 # 2 = obj file path
 define src_vars
 
-# create a target specific variable for each source attribute the
-# underscore is there because there exists attributes for targets that
-# match the target specific variable names
-$(2): _src_cxxflags := $(call cxxflags,$1)
-$(2): _src_cppflags := $(call cppflags,$1)
-$(2): _src_incdirs := $(call incdirs,$1)
+# create a target specific variable for each source attribute
+$(2): SRC_CFLAGS := $(call cflags,$1)
+$(2): SRC_INCDIRS := $(call incdirs,$1)
+$(2): SRC_CPPFLAGS := $(filter -D%,$(call cflags,$1))
 $(call reset_attributes,$1)
 endef
