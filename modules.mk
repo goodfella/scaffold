@@ -147,9 +147,9 @@ $(call obj_file,$(1),$(2)) : $1
 	$(call gxx,$(CFLAGS) \
                    $$(PREREQ_CFLAGS) \
                    $$(SRC_CFLAGS) \
-                   $(call inc_dirs,$(include_dirs)) \
-                   $$(call inc_dirs,$$(PREREQ_INCDIRS)) \
-                   $$(call inc_dirs,$$(SRC_INCDIRS)) $3 -c,,$$@,$1)
+                   $(include_dirs:%=-I%) \
+                   $$(PREREQ_INCDIRS:%=-I%) \
+                   $$(SRC_INCDIRS:%=-I%) $3 -c,,$$@,$1)
 
 endef
 
