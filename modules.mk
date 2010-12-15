@@ -157,7 +157,7 @@ $(call obj_file,$(1),$(2)) : $1
                           $(call gcc_cppflags,$(CXXFLAGS) $(SRC_CXXFLAGS)) \
                           $$(PREREQ_CPPFLAGS) \
                           $$(SRC_CPPFLAGS) \
-                          $(call gcc_incdirs,$(include_dirs)) \
+                          $(call gcc_incdirs,$(INCDIRS)) \
                           $$(PREREQ_INCDIRS) \
                           $$(SRC_INCDIRS),, \
                           $(addsuffix .d,$$@),$1)
@@ -166,7 +166,7 @@ $(call obj_file,$(1),$(2)) : $1
                    $(SRC_CXXFLAGS) \
                    $$(PREREQ_CFLAGS) \
                    $$(SRC_CFLAGS) \
-                   $(call gcc_incdirs,$(include_dirs)) \
+                   $(call gcc_incdirs,$(INCDIRS)) \
                    $$(PREREQ_INCDIRS) \
                    $$(SRC_INCDIRS) $3 -c,,$$@,$1)
 

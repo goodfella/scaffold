@@ -45,9 +45,6 @@ $(foreach module,$(modules),$(eval $(call create_module_targets,$(module))))
 
 # clean_files: files to delete with the clean-files target
 
-# list of directories with headers
-include_dirs +=
-
 .PHONY: clean-build clean-targets clean-files clean-all programs libraries
 
 

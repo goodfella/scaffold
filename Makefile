@@ -2,7 +2,7 @@
 CXXFLAGS += -g -Wall -pedantic
 
 # the include directories
-include_dirs += include .
+INCDIRS += include .
 
 include build.mk
 
