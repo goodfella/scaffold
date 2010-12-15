@@ -95,6 +95,14 @@ $(filter -D%,$1)
 endef
 
 
+# Prepends the necessary gcc flag to include directories
+
+# 1 = list of include directores
+define gcc_incdirs
+$(patsubst %,-I%,$1)
+endef
+
+
 # creates the target specific variables for all targets
 
 # 1 = target name
@@ -102,7 +110,7 @@ endef
 define create_target_vars
 
 $(2): TARGET_CFLAGS := $(call cflags,$1)
-$(2): PREREQ_INCDIRS := $(call src_incdirs,$1)
+$(2): PREREQ_INCDIRS := $(call gcc_incdirs,$(call src_incdirs,$1))
 $(2): PREREQ_CFLAGS := $(call src_cflags,$1)
 $(2): PREREQ_CPPFLAGS := $(call gcc_cppflags,$(call src_cflags,$1))
 $(2): TARGET_LIBDIRS := $(call libdirs,$1)
@@ -149,18 +157,18 @@ $(call obj_file,$(1),$(2)) : $1
                           $(call gcc_cppflags,$(CXXFLAGS) $(SRC_CXXFLAGS)) \
                           $$(PREREQ_CPPFLAGS) \
                           $$(SRC_CPPFLAGS) \
-                          $(include_dirs:%=-I%) \
-                          $$(PREREQ_INCDIRS:%=-I%) \
-                          $$(SRC_INCDIRS:%=-I%),, \
+                          $(call gcc_incdirs,$(include_dirs)) \
+                          $$(PREREQ_INCDIRS) \
+                          $$(SRC_INCDIRS),, \
                           $(addsuffix .d,$$@),$1)
 
 	$(call gxx,$(CXXFLAGS) \
                    $(SRC_CXXFLAGS) \
                    $$(PREREQ_CFLAGS) \
                    $$(SRC_CFLAGS) \
-                   $(include_dirs:%=-I%) \
-                   $$(PREREQ_INCDIRS:%=-I%) \
-                   $$(SRC_INCDIRS:%=-I%) $3 -c,,$$@,$1)
+                   $(call gcc_incdirs,$(include_dirs)) \
+                   $$(PREREQ_INCDIRS) \
+                   $$(SRC_INCDIRS) $3 -c,,$$@,$1)
 
 endef
 
@@ -304,7 +312,7 @@ define src_vars
 
 # create a target specific variable for each source attribute
 $(2): SRC_CFLAGS := $(call cflags,$1)
-$(2): SRC_INCDIRS := $(call incdirs,$1)
+$(2): SRC_INCDIRS := $(call gcc_incdirs,$(call incdirs,$1))
 $(2): SRC_CPPFLAGS := $(call gcc_cppflags,$(call cflags,$1))
 $(call reset_attributes,$1)
 endef
