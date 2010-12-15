@@ -43,8 +43,8 @@ $(call gxx,-shared $(if $(2),-Wl$(,)-soname$(,)$(2)) \
            $(CXXFLAGS) \
            $(SHLIB_CXXFLAGS) \
            $$(TARGET_CFLAGS) \
-           $$(call lib_dirs,$$(TARGET_LIBDIRS)) \
-           $$(call lib_dirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)), \
+           $$(TARGET_LIBDIRS) \
+           $$(call gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)), \
            $$(call link_libs,$$(TARGET_LIBS) $$(TARGET_PRELIBS)), \
            $$@,$$(filter %.$(obj_file_suffix),$$^))
 endef
@@ -103,6 +103,14 @@ $(patsubst %,-I%,$1)
 endef
 
 
+# Prepends the necessary gcc flags to library directores
+
+# 1 = list of library directories
+define gcc_libdirs
+$(patsubst %,-L%,$1)
+endef
+
+
 # creates the target specific variables for all targets
 
 # 1 = target name
@@ -113,7 +121,7 @@ $(2): TARGET_CFLAGS := $(call cflags,$1)
 $(2): PREREQ_INCDIRS := $(call gcc_incdirs,$(call src_incdirs,$1))
 $(2): PREREQ_CFLAGS := $(call src_cflags,$1)
 $(2): PREREQ_CPPFLAGS := $(call gcc_cppflags,$(call src_cflags,$1))
-$(2): TARGET_LIBDIRS := $(call libdirs,$1)
+$(2): TARGET_LIBDIRS := $(call gcc_libdirs,$(call libdirs,$1))
 $(2): TARGET_LIBS := $(call libs,$1)
 $(2): TARGET_PRELIBS := $(call prelibs,$1)
 
@@ -202,8 +210,8 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
 	$(call gxx,$(CXXFLAGS) \
                    $(PROG_CXXFLAGS) \
                    $$(TARGET_CFLAGS) \
-                   $$(call lib_dirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)) \
-                   $$(call lib_dirs,$$(TARGET_LIBDIRS)), \
+                   $$(call gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)) \
+                   $$(TARGET_LIBDIRS), \
                    $$(call link_libs,$$(TARGET_LIBS)) \
                    $$(call link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)), \
                    $$@,$$(filter %.$(obj_file_suffix),$$^))
