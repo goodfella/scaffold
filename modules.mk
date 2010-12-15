@@ -86,6 +86,14 @@ $(foreach prelib,$(1),$(call $(prelib)_$(2)))
 endef
 
 
+# filters the cppflags to pass to gcc
+
+# 1 = flags that are passed to the compiler
+define gcc_cppflags
+$(filter -D%,$1)
+endef
+
+
 # creates the target specific variables for all targets
 
 # 1 = target name
@@ -95,7 +103,7 @@ define create_target_vars
 $(2): TARGET_CFLAGS := $(call cflags,$1)
 $(2): PREREQ_INCDIRS := $(call src_incdirs,$1)
 $(2): PREREQ_CFLAGS := $(call src_cflags,$1)
-$(2): PREREQ_CPPFLAGS := $(filter -D%,$(call src_cflags,$1))
+$(2): PREREQ_CPPFLAGS := $(call gcc_cppflags,$(call src_cflags,$1))
 $(2): TARGET_LIBDIRS := $(call libdirs,$1)
 $(2): TARGET_LIBS := $(call libs,$1)
 $(2): TARGET_PRELIBS := $(call prelibs,$1)
@@ -293,6 +301,6 @@ define src_vars
 # create a target specific variable for each source attribute
 $(2): SRC_CFLAGS := $(call cflags,$1)
 $(2): SRC_INCDIRS := $(call incdirs,$1)
-$(2): SRC_CPPFLAGS := $(filter -D%,$(call cflags,$1))
+$(2): SRC_CPPFLAGS := $(call gcc_cppflags,$(call cflags,$1))
 $(call reset_attributes,$1)
 endef
