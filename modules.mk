@@ -40,7 +40,8 @@ endef
 # 2 = soname of library
 define compile_cxx_shlib
 $(call gxx,-shared $(if $(2),-Wl$(,)-soname$(,)$(2)) \
-           $(CFLAGS) \
+           $(CXXFLAGS) \
+           $(SHLIB_CXXFLAGS) \
            $$(TARGET_CFLAGS) \
            $$(call lib_dirs,$$(TARGET_LIBDIRS)) \
            $$(call lib_dirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)), \
@@ -145,6 +146,7 @@ endef
 define obj_rule
 $(call obj_file,$(1),$(2)) : $1
 	$(call gxx_noabbrv,-M -MM -MD -MT $$@ \
+                          $(call gcc_cppflags,$(CXXFLAGS) $(SRC_CXXFLAGS)) \
                           $$(PREREQ_CPPFLAGS) \
                           $$(SRC_CPPFLAGS) \
                           $(include_dirs:%=-I%) \
@@ -152,7 +154,8 @@ $(call obj_file,$(1),$(2)) : $1
                           $$(SRC_INCDIRS:%=-I%),, \
                           $(addsuffix .d,$$@),$1)
 
-	$(call gxx,$(CFLAGS) \
+	$(call gxx,$(CXXFLAGS) \
+                   $(SRC_CXXFLAGS) \
                    $$(PREREQ_CFLAGS) \
                    $$(SRC_CFLAGS) \
                    $(include_dirs:%=-I%) \
@@ -188,7 +191,8 @@ object_files += $(4)
 # /path/to/program : <prelibs> <object files> | <pre-rules>
 $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
 
-	$(call gxx,$(CFLAGS) \
+	$(call gxx,$(CXXFLAGS) \
+                   $(PROG_CXXFLAGS) \
                    $$(TARGET_CFLAGS) \
                    $$(call lib_dirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)) \
                    $$(call lib_dirs,$$(TARGET_LIBDIRS)), \
