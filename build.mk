@@ -6,7 +6,6 @@
 include $(dir $(lastword $(MAKEFILE_LIST)))variables.mk
 include $(dir $(lastword $(MAKEFILE_LIST)))attributes.mk
 include $(dir $(lastword $(MAKEFILE_LIST)))commands.mk
-include $(dir $(lastword $(MAKEFILE_LIST)))functions.mk
 include $(dir $(lastword $(MAKEFILE_LIST)))module-helper.mk
 include $(dir $(lastword $(MAKEFILE_LIST)))modules.mk
 

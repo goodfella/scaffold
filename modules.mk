@@ -45,7 +45,8 @@ $(call gxx,-shared $(if $(2),-Wl$(,)-soname$(,)$(2)) \
            $$(TARGET_CFLAGS) \
            $$(TARGET_LIBDIRS) \
            $$(call gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)), \
-           $$(call link_libs,$$(TARGET_LIBS) $$(TARGET_PRELIBS)), \
+           $$(TARGET_LIBS) \
+           $$(call gcc_link_libs,$$(TARGET_PRELIBS)), \
            $$@,$$(filter %.$(obj_file_suffix),$$^))
 endef
 
@@ -111,6 +112,15 @@ $(patsubst %,-L%,$1)
 endef
 
 
+# Prepends the necessary gcc flags to a list of libraries to link
+# against
+
+# 1 = list of libraries to link against
+define gcc_link_libs
+$(patsubst %,-l%,$1)
+endef
+
+
 # creates the target specific variables for all targets
 
 # 1 = target name
@@ -122,7 +132,7 @@ $(2): PREREQ_INCDIRS := $(call gcc_incdirs,$(call src_incdirs,$1))
 $(2): PREREQ_CFLAGS := $(call src_cflags,$1)
 $(2): PREREQ_CPPFLAGS := $(call gcc_cppflags,$(call src_cflags,$1))
 $(2): TARGET_LIBDIRS := $(call gcc_libdirs,$(call libdirs,$1))
-$(2): TARGET_LIBS := $(call libs,$1)
+$(2): TARGET_LIBS := $(call gcc_link_libs,$(call libs,$1))
 $(2): TARGET_PRELIBS := $(call prelibs,$1)
 
 endef
@@ -212,8 +222,8 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
                    $$(TARGET_CFLAGS) \
                    $$(call gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)) \
                    $$(TARGET_LIBDIRS), \
-                   $$(call link_libs,$$(TARGET_LIBS)) \
-                   $$(call link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)), \
+                   $$(TARGET_LIBS) \
+                   $$(call gcc_link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)), \
                    $$@,$$(filter %.$(obj_file_suffix),$$^))
 
 # generate the rules for each object file
