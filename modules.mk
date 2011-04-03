@@ -34,32 +34,6 @@ $(foreach prelib,$(call prelibs,$1),$(dollar)$$($(prelib)_target))
 endef
 
 
-# gxx command for a shared library
-
-# 1 = name of shared library
-# 2 = soname of library
-define compile_cxx_shlib
-$(call gxx,-shared $(if $(2),-Wl$(,)-soname$(,)$(2)) \
-           $(CXXFLAGS) \
-           $(SHLIB_CXXFLAGS) \
-           $$(TARGET_CFLAGS) \
-           $$(TARGET_LIBDIRS) \
-           $$(call prepend_gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)), \
-           $$(TARGET_LIBS) \
-           $$(call prepend_gcc_link_libs,$$(TARGET_PRELIBS)), \
-           $$@,$$(filter %.$(obj_file_suffix),$$^))
-endef
-
-
-# creates a soft link for a shared library
-
-# 1 = link path
-# 2 = target
-define link_shlib
-$(call ln,$$(notdir $$<),$$(@))
-endef
-
-
 # returns an object file given a source file
 
 # 1 = source file
@@ -126,6 +100,79 @@ endef
 # 1 = list of libraries to link against
 define prepend_gcc_link_libs
 $(patsubst %,-l%,$1)
+endef
+
+
+# compiler command for a linked target
+
+# 1 = compiler name
+# 2 = compiler flags
+# 3 = lib dirs
+# 4 = link libraries
+define link_target
+$(call $(1),\
+            $(2)\
+            $(CFLAGS)\
+            $$(TARGET_CFLAGS)\
+            $$(TARGET_LIBDIRS)\
+            $(3)\
+            $$(call prepend_gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)),\
+            $(4)\
+            $$(TARGET_LIBS),\
+            $$@,$$(filter %.$(obj_file_suffix),$$^))
+endef
+
+
+# compiler command for a program
+
+# 1 = compiler name
+# 2 = compiler flags
+# 3 = lib dirs
+# 4 = libs
+define link_program
+$(call link_target,$1,\
+                   $2 $(PROG_CFLAGS),\
+                   $3,\
+                   $4 $$(call prepend_gcc_link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)))
+endef
+
+
+# compiler command for a c++ program
+
+define link_cxx_program
+$(call link_program,gxx,$(CXXFLAGS) $(PROG_CXXFLAGS),,)
+endef
+
+
+# compiler command for a shared library
+
+# 1 = compiler command
+# 2 = soname of shared library
+# 3 = compiler flags
+# 4 = lib dirs
+# 5 = libs
+define link_shlib
+$(call link_target,$1,-shared $(if $(2),-Wl$(,)-soname$(,)$(2))\
+                   $3 $(SHLIB_CFLAGS),\
+                   $(4),\
+                   $5 $$(call prepend_gcc_link_libs,$$(TARGET_PRELIBS)))
+endef
+
+
+# compiler command for a c++ shared library
+
+# 1 = soname of shared library
+define link_cxx_shlib
+$(call link_shlib,gxx,$1,$(CXXFLAGS) $(SHLIB_CXXFLAGS),,)
+endef
+
+
+# creates a soft link for a shared library
+
+# 1 = link path
+# 2 = target
+define create_shlib_symlink
+$(call ln,$$(notdir $$<),$$(@))
 endef
 
 
@@ -224,15 +271,7 @@ object_files += $(4)
 
 # /path/to/program : <prelibs> <object files> | <pre-rules>
 $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
-
-	$(call gxx,$(CXXFLAGS) \
-                   $(PROG_CXXFLAGS) \
-                   $$(TARGET_CFLAGS) \
-                   $$(call prepend_gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)) \
-                   $$(TARGET_LIBDIRS), \
-                   $$(TARGET_LIBS) \
-                   $$(call prepend_gcc_link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)), \
-                   $$@,$$(filter %.$(obj_file_suffix),$$^))
+	$(call link_cxx_program)
 
 # generate the rules for each object file
 $(foreach src,$(3),$(call obj_rule,$(src),$(obj_file_suffix),))
@@ -288,14 +327,14 @@ ifneq ($(call minor,$(1)),)
 shlib_clean += $(call soname,$(1),$(2)) $(call realname,$(1),$(2))
 
 $(2): $(call soname,$(1),$(2))
-	$(call link_shlib)
+	$(call create_shlib_symlink)
 
 $(call soname,$(1),$(2)): $(call realname,$(1),$(2))
-	$(call link_shlib)
+	$(call create_shlib_symlink)
 
 # /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
 $(call realname,$(1),$(2)): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
-	$(call compile_cxx_shlib,$(1),$(call soname,$(1),$(notdir $(2))))
+	$(call link_cxx_shlib,$(call soname,$(1),$(notdir $(2))))
 
 
 # we have a version number without a minor number, so the linker name
@@ -305,11 +344,11 @@ else
 shlib_clean += $(call soname,$(1),$(2))
 
 $(2): $(call soname,$(1),$(2))
-	$(call link_shlib)
+	$(call create_shlib_symlink)
 
 # /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
 $(call soname,$(1),$(2)): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
-	$(call compile_cxx_shlib,$(1),$(call soname,$(1),$(notdir $(2))))
+	$(call link_cxx_shlib,$(call soname,$(1),$(notdir $(2))))
 
 endif
 
@@ -318,7 +357,7 @@ else
 
 # /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
 $(2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
-	$(call compile_cxx_shlib,$(1),)
+	$(call link_cxx_shlib,)
 
 endif
 
