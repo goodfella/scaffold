@@ -44,9 +44,9 @@ $(call gxx,-shared $(if $(2),-Wl$(,)-soname$(,)$(2)) \
            $(SHLIB_CXXFLAGS) \
            $$(TARGET_CFLAGS) \
            $$(TARGET_LIBDIRS) \
-           $$(call gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)), \
+           $$(call prepend_gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)), \
            $$(TARGET_LIBS) \
-           $$(call gcc_link_libs,$$(TARGET_PRELIBS)), \
+           $$(call prepend_gcc_link_libs,$$(TARGET_PRELIBS)), \
            $$@,$$(filter %.$(obj_file_suffix),$$^))
 endef
 
@@ -91,7 +91,7 @@ endef
 # filters the cppflags to pass to gcc
 
 # 1 = flags that are passed to the compiler
-define gcc_cppflags
+define filter_gcc_cppflags
 $(filter -D%,$1)
 endef
 
@@ -99,7 +99,7 @@ endef
 # Prepends the necessary gcc flag to include directories
 
 # 1 = list of include directores
-define gcc_incdirs
+define prepend_gcc_incdirs
 $(patsubst %,-I%,$1)
 endef
 
@@ -107,7 +107,7 @@ endef
 # Prepends the necessary gcc flags to library directores
 
 # 1 = list of library directories
-define gcc_libdirs
+define prepend_gcc_libdirs
 $(patsubst %,-L%,$1)
 endef
 
@@ -116,7 +116,7 @@ endef
 # against
 
 # 1 = list of libraries to link against
-define gcc_link_libs
+define prepend_gcc_link_libs
 $(patsubst %,-l%,$1)
 endef
 
@@ -128,11 +128,11 @@ endef
 define create_target_vars
 
 $(2): TARGET_CFLAGS := $(call cflags,$1)
-$(2): PREREQ_INCDIRS := $(call gcc_incdirs,$(call src_incdirs,$1))
+$(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call src_incdirs,$1))
 $(2): PREREQ_CFLAGS := $(call src_cflags,$1)
-$(2): PREREQ_CPPFLAGS := $(call gcc_cppflags,$(call src_cflags,$1))
-$(2): TARGET_LIBDIRS := $(call gcc_libdirs,$(call libdirs,$1))
-$(2): TARGET_LIBS := $(call gcc_link_libs,$(call libs,$1))
+$(2): PREREQ_CPPFLAGS := $(call filter_gcc_cppflags,$(call src_cflags,$1))
+$(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
+$(2): TARGET_LIBS := $(call prepend_gcc_link_libs,$(call libs,$1))
 $(2): TARGET_PRELIBS := $(call prelibs,$1)
 
 endef
@@ -172,10 +172,10 @@ endef
 define obj_rule
 $(call obj_file,$(1),$(2)) : $1
 	$(call gxx_noabbrv,-M -MM -MD -MT $$@ \
-                          $(call gcc_cppflags,$(CXXFLAGS) $(SRC_CXXFLAGS)) \
+                          $(call filter_gcc_cppflags,$(CXXFLAGS) $(SRC_CXXFLAGS)) \
                           $$(PREREQ_CPPFLAGS) \
                           $$(SRC_CPPFLAGS) \
-                          $(call gcc_incdirs,$(INCDIRS)) \
+                          $(call prepend_gcc_incdirs,$(INCDIRS)) \
                           $$(PREREQ_INCDIRS) \
                           $$(SRC_INCDIRS),, \
                           $(addsuffix .d,$$@),$1)
@@ -184,7 +184,7 @@ $(call obj_file,$(1),$(2)) : $1
                    $(SRC_CXXFLAGS) \
                    $$(PREREQ_CFLAGS) \
                    $$(SRC_CFLAGS) \
-                   $(call gcc_incdirs,$(INCDIRS)) \
+                   $(call prepend_gcc_incdirs,$(INCDIRS)) \
                    $$(PREREQ_INCDIRS) \
                    $$(SRC_INCDIRS) $3 -c,,$$@,$1)
 
@@ -220,10 +220,10 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
 	$(call gxx,$(CXXFLAGS) \
                    $(PROG_CXXFLAGS) \
                    $$(TARGET_CFLAGS) \
-                   $$(call gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)) \
+                   $$(call prepend_gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)) \
                    $$(TARGET_LIBDIRS), \
                    $$(TARGET_LIBS) \
-                   $$(call gcc_link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)), \
+                   $$(call prepend_gcc_link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)), \
                    $$@,$$(filter %.$(obj_file_suffix),$$^))
 
 # generate the rules for each object file
@@ -330,7 +330,7 @@ define src_vars
 
 # create a target specific variable for each source attribute
 $(2): SRC_CFLAGS := $(call cflags,$1)
-$(2): SRC_INCDIRS := $(call gcc_incdirs,$(call incdirs,$1))
-$(2): SRC_CPPFLAGS := $(call gcc_cppflags,$(call cflags,$1))
+$(2): SRC_INCDIRS := $(call prepend_gcc_incdirs,$(call incdirs,$1))
+$(2): SRC_CPPFLAGS := $(call filter_gcc_cppflags,$(call cflags,$1))
 $(call reset_attributes,$1)
 endef
