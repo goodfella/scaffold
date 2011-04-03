@@ -42,6 +42,11 @@ define cflags
 $(call attribute,$1,$0)
 endef
 
+# flags for preprocessor
+define cppflags
+$(call attribute,$1,$0)
+endef
+
 # include directories
 define incdirs
 $(call attribute,$1,$0)
@@ -68,9 +73,14 @@ define srcs
 $(call attribute,$1,$0)
 endef
 
-# source compiler to apply to all sources specified in the srcs
+# compiler flags to apply to all sources specified in the srcs
 # attribute
 define src_cflags
+$(call attribute,$1,$0)
+endef
+
+# cpp flags to apply to all source specified in the srcs attribute
+define src_cppflags
 $(call attribute,$1,$0)
 endef
 
@@ -114,12 +124,14 @@ endef
 # 1 = object
 define reset_attributes
 $(1)_cflags :=
+$(1)_cppflags :=
 $(1)_incdirs :=
 $(1)_prelibs :=
 $(1)_libdirs :=
 $(1)_libs :=
 $(1)_srcs :=
 $(1)_src_cflags :=
+$(1)_src_cppflags :=
 $(1)_version :=
 $(1)_minor :=
 $(1)_release :=
