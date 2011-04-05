@@ -176,6 +176,58 @@ $(call ln,$$(notdir $$<),$$(@))
 endef
 
 
+# creates the rule for an object file
+
+# 1 = source file path
+# 2 = object file suffix
+# 3 = cflags
+# 4 = cppflags
+# 5 = incdirs
+# 6 = extra gcc args
+define obj_rule
+$(call obj_file,$(1),$(2)) : $1
+	$(call gxx_noabbrv,-M -MM -MD -MT $$@ \
+                          $$(call filter_gcc_cppflags,$3 $(CFLAGS) $(SRC_CFLAGS) $$(PREREQ_CFLAGS) $$(SRC_VAR_CFLAGS)) \
+                          $(call prepend_gcc_cppflags,$(4)) \
+                          $(call prepend_gcc_cppflags,$(CPPFLAGS)) \
+                          $(call prepend_gcc_cppflags,$(SRC_CPPFLAGS)) \
+                          $$(PREREQ_CPPFLAGS) \
+                          $$(SRC_VAR_CPPFLAGS) \
+                          $(call prepend_gcc_incdirs,$(5)) \
+                          $(call prepend_gcc_incdirs,$(INCDIRS)) \
+                          $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
+                          $$(PREREQ_INCDIRS) \
+                          $$(SRC_VAR_INCDIRS),, \
+                          $(addsuffix .d,$$@),$1)
+
+	$(call gxx,$3 \
+                   $(CFLAGS) \
+                   $(SRC_CFLAGS) \
+                   $$(PREREQ_CFLAGS) \
+                   $$(SRC_VAR_CFLAGS) \
+                   $(call prepend_gcc_cppflags,$(4)) \
+                   $(call prepend_gcc_cppflags,$(CPPFLAGS)) \
+                   $(call prepend_gcc_cppflags,$(SRC_CPPFLAGS)) \
+                   $$(PREREQ_CPPFLAGS) \
+                   $$(SRC_VAR_CPPFLAGS) \
+                   $(call prepend_gcc_incdirs,$(5)) \
+                   $(call prepend_gcc_incdirs,$(INCDIRS)) \
+                   $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
+                   $$(PREREQ_INCDIRS) \
+                   $$(SRC_VAR_INCDIRS) \
+                   $6 -c,,$$@,$1)
+endef
+
+# creates the object file rule for a C++ source file
+
+# 1 = source file path
+# 2 = object file suffix
+# 3 = extra gcc args
+define cxx_obj_rule
+$(call obj_rule,$1,$2,$(CXXFLAGS) $(SRC_CXXFLAGS),,$3)
+endef
+
+
 # creates the target specific variables for all targets
 
 # 1 = target name
@@ -219,34 +271,6 @@ $(call reset_module_vars)
 endef
 
 
-# creates the rule for an object file
-
-# 1 = source file path
-# 2 = object file suffix
-# 3 = extra gcc args
-define obj_rule
-$(call obj_file,$(1),$(2)) : $1
-	$(call gxx_noabbrv,-M -MM -MD -MT $$@ \
-                          $(call filter_gcc_cppflags,$(CXXFLAGS) $(SRC_CXXFLAGS)) \
-                          $$(PREREQ_CPPFLAGS) \
-                          $$(SRC_CPPFLAGS) \
-                          $(call prepend_gcc_incdirs,$(INCDIRS)) \
-                          $$(PREREQ_INCDIRS) \
-                          $$(SRC_INCDIRS),, \
-                          $(addsuffix .d,$$@),$1)
-
-	$(call gxx,$(CXXFLAGS) \
-                   $(SRC_CXXFLAGS) \
-                   $$(PREREQ_CFLAGS) \
-                   $$(SRC_CFLAGS) \
-                   $(call prepend_gcc_incdirs,$(INCDIRS)) \
-                   $$(PREREQ_INCDIRS) \
-                   $$(SRC_INCDIRS) $3 -c,,$$@,$1)
-
-endef
-
-
-
 # creates the rule for a C++ program
 
 # 1 = program name
@@ -274,7 +298,7 @@ $(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
 	$(call link_cxx_program)
 
 # generate the rules for each object file
-$(foreach src,$(3),$(call obj_rule,$(src),$(obj_file_suffix),))
+$(foreach src,$(3),$(call cxx_obj_rule,$(src),$(obj_file_suffix),))
 
 $(call reset_attributes,$1)
 endef
@@ -363,7 +387,7 @@ endif
 
 
 # generate the rules for the object files
-$(foreach src,$(3),$(call obj_rule,$(src),$(obj_file_suffix),-fPIC))
+$(foreach src,$(3),$(call cxx_obj_rule,$(src),$(obj_file_suffix),-fPIC))
 
 $(call reset_attributes,$1)
 endef
@@ -376,8 +400,8 @@ endef
 define src_vars
 
 # create a target specific variable for each source attribute
-$(2): SRC_CFLAGS := $(call cflags,$1)
-$(2): SRC_INCDIRS := $(call prepend_gcc_incdirs,$(call incdirs,$1))
-$(2): SRC_CPPFLAGS := $(call filter_gcc_cppflags,$(call cflags,$1)) (call prepend_gcc_cppflags,$(call cppflags,$1))
+$(2): SRC_VAR_CFLAGS := $(call cflags,$1)
+$(2): SRC_VAR_INCDIRS := $(call prepend_gcc_incdirs,$(call incdirs,$1))
+$(2): SRC_VAR_CPPFLAGS := $(call filter_gcc_cppflags,$(call cflags,$1)) (call prepend_gcc_cppflags,$(call cppflags,$1))
 $(call reset_attributes,$1)
 endef
