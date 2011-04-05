@@ -237,7 +237,7 @@ define create_target_vars
 $(2): TARGET_CFLAGS := $(call cflags,$1)
 $(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call src_incdirs,$1))
 $(2): PREREQ_CFLAGS := $(call src_cflags,$1)
-$(2): PREREQ_CPPFLAGS := $(call filter_gcc_cppflags,$(call src_cflags,$1)) $(call prepend_gcc_cppflags,$(call src_cppflags,$1))
+$(2): PREREQ_CPPFLAGS := $(call prepend_gcc_cppflags,$(call src_cppflags,$1))
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
 $(2): TARGET_LIBS := $(call prepend_gcc_link_libs,$(call libs,$1))
 $(2): TARGET_PRELIBS := $(call prelibs,$1)
@@ -402,6 +402,6 @@ define src_vars
 # create a target specific variable for each source attribute
 $(2): SRC_VAR_CFLAGS := $(call cflags,$1)
 $(2): SRC_VAR_INCDIRS := $(call prepend_gcc_incdirs,$(call incdirs,$1))
-$(2): SRC_VAR_CPPFLAGS := $(call filter_gcc_cppflags,$(call cflags,$1)) (call prepend_gcc_cppflags,$(call cppflags,$1))
+$(2): SRC_VAR_CPPFLAGS := $(call prepend_gcc_cppflags,$(call cppflags,$1))
 $(call reset_attributes,$1)
 endef
