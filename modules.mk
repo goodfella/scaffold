@@ -110,15 +110,14 @@ endef
 # 3 = lib dirs
 # 4 = link libraries
 define link_target
-$(call $(1),\
-            $(2)\
+$(call $(1),$$(strip $(2)\
             $(CFLAGS)\
             $$(TARGET_CFLAGS)\
             $$(TARGET_LIBDIRS)\
             $(3)\
-            $$(call prepend_gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs)),\
-            $(4)\
-            $$(TARGET_LIBS),\
+            $$(call prepend_gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs))),\
+            $$(strip $(4)\
+            $$(TARGET_LIBS)),\
             $$@,$$(filter %.$(obj_file_suffix),$$^))
 endef
 
@@ -186,7 +185,7 @@ endef
 # 6 = extra gcc args
 define obj_rule
 $(call obj_file,$(1),$(2)) : $1
-	$(call gxx_noabbrv,-M -MM -MD -MT $$@ \
+	$(call gxx_noabbrv,$$(strip -M -MM -MD -MT $$@ \
                           $$(call filter_gcc_cppflags,$3 $(CFLAGS) $(SRC_CFLAGS) $$(PREREQ_CFLAGS) $$(SRC_VAR_CFLAGS)) \
                           $(call prepend_gcc_cppflags,$(4)) \
                           $(call prepend_gcc_cppflags,$(CPPFLAGS)) \
@@ -197,10 +196,10 @@ $(call obj_file,$(1),$(2)) : $1
                           $(call prepend_gcc_incdirs,$(INCDIRS)) \
                           $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
                           $$(PREREQ_INCDIRS) \
-                          $$(SRC_VAR_INCDIRS),, \
+                          $$(SRC_VAR_INCDIRS)),, \
                           $(addsuffix .d,$$@),$1)
 
-	$(call gxx,$3 \
+	$(call gxx,$$(strip $3 \
                    $(CFLAGS) \
                    $(SRC_CFLAGS) \
                    $$(PREREQ_CFLAGS) \
@@ -215,7 +214,7 @@ $(call obj_file,$(1),$(2)) : $1
                    $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
                    $$(PREREQ_INCDIRS) \
                    $$(SRC_VAR_INCDIRS) \
-                   $6 -c,,$$@,$1)
+                   $6 -c),,$$@,$1)
 endef
 
 # creates the object file rule for a C++ source file
