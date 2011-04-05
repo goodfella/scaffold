@@ -130,10 +130,7 @@ endef
 # 3 = lib dirs
 # 4 = libs
 define link_program
-$(call link_target,$1,\
-                   $2 $(PROG_CFLAGS),\
-                   $3,\
-                   $4)
+$(call link_target,$1,$2 $(PROG_CFLAGS),$3,$4)
 endef
 
 
