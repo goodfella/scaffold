@@ -3,6 +3,24 @@
 # this file should be included by the projects top level Makefile.  It
 # defines the default build and clean targets
 
+# check for required make features
+ifeq ($(.FEATURES),)
+$(error Scaffold requires the .FEATURES variable)
+endif
+
+ifeq ($(filter target-specific,$(.FEATURES)),)
+$(error Scaffold requires target specific variables)
+endif
+
+ifeq ($(filter second-expansion,$(.FEATURES)),)
+$(error Scaffold requires secondary expansion)
+endif
+
+ifeq ($(filter order-only,$(.FEATURES)),)
+$(error Scaffold requires order only prerequisites)
+endif
+
+
 include $(dir $(lastword $(MAKEFILE_LIST)))variables.mk
 include $(dir $(lastword $(MAKEFILE_LIST)))attributes.mk
 include $(dir $(lastword $(MAKEFILE_LIST)))commands.mk
