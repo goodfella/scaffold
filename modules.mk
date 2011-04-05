@@ -117,6 +117,7 @@ $(call $(1),$$(strip $(2)\
             $(3)\
             $$(call prepend_gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs))),\
             $$(strip $(4)\
+            $$(call prepend_gcc_link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)) \
             $$(TARGET_LIBS)),\
             $$@,$$(filter %.$(obj_file_suffix),$$^))
 endef
@@ -132,7 +133,7 @@ define link_program
 $(call link_target,$1,\
                    $2 $(PROG_CFLAGS),\
                    $3,\
-                   $4 $$(call prepend_gcc_link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)))
+                   $4)
 endef
 
 
@@ -154,7 +155,7 @@ define link_shlib
 $(call link_target,$1,-shared $(if $(2),-Wl$(,)-soname$(,)$(2))\
                    $3 $(SHLIB_CFLAGS),\
                    $(4),\
-                   $5 $$(call prepend_gcc_link_libs,$$(TARGET_PRELIBS)))
+                   $5)
 endef
 
 
