@@ -221,7 +221,7 @@ endef
 # 2 = object file suffix
 # 3 = extra gcc args
 define cxx_obj_rule
-$(call obj_rule,$1,$2,$(CXXFLAGS) $(SRC_CXXFLAGS),,$3)
+$(call obj_rule,$1,$2,$(CXXFLAGS) $(SRC_CXXFLAGS),,,$3)
 endef
 
 
