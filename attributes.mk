@@ -52,9 +52,8 @@ define incdirs
 $(call attribute,$1,$0)
 endef
 
-# libraries that need to be built before the target that the target
-# links against
-define prelibs
+# shared libraries that need to be built before the target
+define preshlibs
 $(call attribute,$1,$0)
 endef
 
@@ -63,8 +62,8 @@ define libdirs
 $(call attribute,$1,$0)
 endef
 
-# system libraries to link against -l
-define libs
+# shared system libraries to link against -l
+define shlibs
 $(call attribute,$1,$0)
 endef
 
@@ -126,9 +125,9 @@ define reset_attributes
 $(1)_cflags :=
 $(1)_cppflags :=
 $(1)_incdirs :=
-$(1)_prelibs :=
+$(1)_preshlibs :=
 $(1)_libdirs :=
-$(1)_libs :=
+$(1)_shlibs :=
 $(1)_srcs :=
 $(1)_src_cflags :=
 $(1)_src_cppflags :=

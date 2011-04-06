@@ -26,11 +26,11 @@ $(addsuffix $(if $(call release,$(1)),.$(call release,$(1)),),$(addsuffix .$(cal
 endef
 
 
-# generates the prelibs for a given object
+# generates the prerequisite libraries for a given target
 
-# 1 = object name
-define prelib_depends
-$(foreach prelib,$(call prelibs,$1),$(dollar)$$($(prelib)_target))
+# 1 = target name
+define prereq_libraries
+$(foreach prereq_lib,$(call preshlibs,$1),$(dollar)$$($(prereq_lib)_shlib_target))
 endef
 
 
@@ -53,12 +53,12 @@ $(foreach src,$(1),$(call obj_file,$(src),$(2)))
 endef
 
 
-# returns a list of data associated with prelibs
+# returns a list of data associated with prerequisite libraries
 
-# 1 = list of prelibs
-# 2 = prelib data to get i.e. (prelibs, prelib-dirs)
-define prelib_info
-$(foreach prelib,$(1),$(call $(prelib)_$(2)))
+# 1 = list of prerequisite libraries
+# 2 = data to get i.e. (preshilb_list, preshlib_dirs)
+define prelibrary_info
+$(foreach prereq_lib,$(1),$(call $(prereq_lib)_$(2)))
 endef
 
 
@@ -98,7 +98,7 @@ endef
 # against
 
 # 1 = list of libraries to link against
-define prepend_gcc_link_libs
+define prepend_gcc_link_shlibs
 $(patsubst %,-l%,$1)
 endef
 
@@ -115,10 +115,10 @@ $(call $(1),$$(strip $(2)\
             $$(TARGET_CFLAGS)\
             $$(TARGET_LIBDIRS)\
             $(3)\
-            $$(call prepend_gcc_libdirs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelib_dirs))),\
+            $$(call prepend_gcc_libdirs,$$(call prelibrary_info,$$(TARGET_PRESHLIBS),preshlib_dirs))),\
             $$(strip $(4)\
-            $$(call prepend_gcc_link_libs,$$(call prelib_info,$$(TARGET_PRELIBS),gen_prelibs)) \
-            $$(TARGET_LIBS)),\
+            $$(call prepend_gcc_link_shlibs,$$(call prelibrary_info,$$(TARGET_PRESHLIBS),preshlib_list)) \
+            $$(TARGET_SHLIBS)),\
             $$@,$$(filter %.$(obj_file_suffix),$$^))
 endef
 
@@ -236,8 +236,8 @@ $(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call src_incdirs,$1))
 $(2): PREREQ_CFLAGS := $(call src_cflags,$1)
 $(2): PREREQ_CPPFLAGS := $(call prepend_gcc_cppflags,$(call src_cppflags,$1))
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
-$(2): TARGET_LIBS := $(call prepend_gcc_link_libs,$(call libs,$1))
-$(2): TARGET_PRELIBS := $(call prelibs,$1)
+$(2): TARGET_SHLIBS := $(call prepend_gcc_link_shlibs,$(call shlibs,$1))
+$(2): TARGET_PRESHLIBS := $(call preshlibs,$1)
 
 endef
 
@@ -291,7 +291,7 @@ $(call add_object_files,$(4))
 # specified in the module.mk
 
 # /path/to/program : <prelibs> <object files> | <pre-rules>
-$(2): $(call prelib_depends,$1) $(4) | $(call pre_rules,$1)
+$(2): $(call prereq_libraries,$1) $(4) | $(call pre_rules,$1)
 	$(call link_cxx_program)
 
 # generate the rules for each object file
@@ -325,16 +325,16 @@ $(1)_dir := $(dir $(2))
 # used by programs and other libraries to list the necessary
 # prerequisites such that the library builds before the targets that
 # require it
-$(1)_target := $(2)
+$(1)_shlib_target := $(2)
 
 # generates the prelibs recursively
-define $(1)_gen_prelibs
-$(1) $(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)_gen_prelibs))
+define $(1)_preshlib_list
+$(1) $(foreach preshlib,$(call preshlibs,$(1)),$$(call $(preshlib)_preshlib_list))
 endef
 
 # generates the prelib directories recursively
-define $(1)_gen_prelib_dirs
-$(dir $(2)) $(foreach prelib,$(call prelibs,$(1)),$$(call $(prelib)_gen_prelib_dirs))
+define $(1)_preshlib_dirs
+$(dir $(2)) $(foreach preshlib,$(call preshlibs,$(1)),$$(call $(preshlib)_preshlib_dirs))
 endef
 
 
@@ -355,7 +355,7 @@ $(call soname,$(1),$(2)): $(call realname,$(1),$(2))
 	$(call create_shlib_symlink)
 
 # /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
-$(call realname,$(1),$(2)): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
+$(call realname,$(1),$(2)): $(call prereq_libraries,$1) $(4) | $(call pre_rule,$1)
 	$(call link_cxx_shlib,$(call soname,$(1),$(notdir $(2))))
 
 
@@ -369,7 +369,7 @@ $(2): $(call soname,$(1),$(2))
 	$(call create_shlib_symlink)
 
 # /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
-$(call soname,$(1),$(2)): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
+$(call soname,$(1),$(2)): $(call prereq_libraries,$1) $(4) | $(call pre_rule,$1)
 	$(call link_cxx_shlib,$(call soname,$(1),$(notdir $(2))))
 
 endif
@@ -378,7 +378,7 @@ endif
 else
 
 # /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
-$(2): $(call prelib_depends,$1) $(4) | $(call pre_rule,$1)
+$(2): $(call prereq_libraries,$1) $(4) | $(call pre_rule,$1)
 	$(call link_cxx_shlib,)
 
 endif
