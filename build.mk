@@ -20,12 +20,12 @@ ifeq ($(filter order-only,$(.FEATURES)),)
 $(error Scaffold requires order only prerequisites)
 endif
 
-
-include $(dir $(lastword $(MAKEFILE_LIST)))variables.mk
-include $(dir $(lastword $(MAKEFILE_LIST)))attributes.mk
-include $(dir $(lastword $(MAKEFILE_LIST)))commands.mk
-include $(dir $(lastword $(MAKEFILE_LIST)))module-helper.mk
-include $(dir $(lastword $(MAKEFILE_LIST)))modules.mk
+scaffold_dir := $(dir $(lastword $(MAKEFILE_LIST)))
+include $(scaffold_dir)variables.mk
+include $(scaffold_dir)attributes.mk
+include $(scaffold_dir)commands.mk
+include $(scaffold_dir)module-helper.mk
+include $(scaffold_dir)modules.mk
 
 
 # these are variables filled in by the module.mk files
