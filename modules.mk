@@ -283,7 +283,7 @@ $(call create_target_vars,$(1),$(2))
 
 sources += $(3)
 cxx_progs += $(2)
-object_files += $(4)
+$(call add_object_files,$(4))
 
 
 # rule to create the program.  The dependencies are the object files
@@ -314,9 +314,10 @@ $(if $(3),,$(error shared library $(1) is missing a $(1)_srcs variable))
 
 $(call create_target_vars,$(1),$(2))
 
-object_files += $(4)
 cxx_shlibs += $(2)
 sources += $(3)
+$(call add_object_files,$(4))
+
 
 # used by programs to get the directory which contains the library
 $(1)_dir := $(dir $(2))

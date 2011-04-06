@@ -33,17 +33,11 @@ include $(scaffold_dir)modules.mk
 # all the sources
 sources :=
 
-# all the object files
-object_files :=
-
 # all the C++ programs
 cxx_progs :=
 
 # all the C++ shared libraries
 cxx_shlibs :=
-
-# all the dependency files generated from the object files
-dependencies := $(shell find -name '*.d')
 
 # module.mk files
 modules := $(shell find -name 'module.mk')
@@ -66,7 +60,7 @@ $(foreach module,$(modules),$(eval $(call create_module_targets,$(module))))
 
 
 ifneq ($(MAKECMDGOALS),clean)
-include $(dependencies)
+-include $(dependencies)
 endif
 
 libraries: $(cxx_shlibs)
