@@ -39,9 +39,6 @@ cxx_progs :=
 # all the C++ shared libraries
 cxx_shlibs :=
 
-# module.mk files
-modules := $(shell find -name 'module.mk')
-
 
 # 1 = module path
 define create_module_targets
