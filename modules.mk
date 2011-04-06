@@ -34,6 +34,15 @@ $(foreach prereq_lib,$(call preshlibs,$1),$(dollar)$$($(prereq_lib)_shlib_target
 endef
 
 
+# returns a list of data associated with prerequisite libraries
+
+# 1 = list of prerequisite libraries
+# 2 = data to get i.e. (preshilb_list, preshlib_dirs)
+define prelibrary_info
+$(foreach prereq_lib,$(1),$(call $(prereq_lib)_$(2)))
+endef
+
+
 # returns an object file given a source file
 
 # 1 = source file
@@ -50,15 +59,6 @@ endef
 # 2 = object file suffix
 define obj_files
 $(foreach src,$(1),$(call obj_file,$(src),$(2)))
-endef
-
-
-# returns a list of data associated with prerequisite libraries
-
-# 1 = list of prerequisite libraries
-# 2 = data to get i.e. (preshilb_list, preshlib_dirs)
-define prelibrary_info
-$(foreach prereq_lib,$(1),$(call $(prereq_lib)_$(2)))
 endef
 
 
