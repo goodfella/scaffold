@@ -14,16 +14,6 @@ $(addprefix $(module_dir),$1)
 endef
 
 
-# creates the variable that stores the value of a attribute for a list
-# of sources
-
-# 1 = list of sources
-# 2 = attribute
-# 3 = attribute values
-define create_src_var
-$(foreach src,$1,$(if $3,$(eval $(src)_$(2)+=$3)))
-endef
-
 # clears out the local module variables
 define reset_module_vars
 
