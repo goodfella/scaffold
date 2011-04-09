@@ -149,7 +149,7 @@ endef
 # 4 = lib dirs
 # 5 = libs
 define link_shlib
-$(call link_target,$1,-shared $(if $(2),-Wl$(,)-soname$(,)$(2))\
+$(call link_target,$1,-shared $(if $(2),-Wl$(comma)-soname$(comma)$(2))\
                    $3 $(SHLIB_CFLAGS),\
                    $(4),\
                    $5)

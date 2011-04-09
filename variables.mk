@@ -6,8 +6,5 @@ obj_file_suffix := o
 depends_file_suffix := .d
 
 semi_colon := ;
-
-# this enables us to put commas in variables
-, := ,
-
+comma := ,
 dollar = $$
