@@ -190,7 +190,7 @@ endef
 # 5 = incdirs
 # 6 = extra gcc args
 define obj_rule
-$(call obj_file,$(1),$(2)) : $1
+$(call obj_file,$(1),$(2)) :
 	$(call gxx_noabbrv,$$(strip -M -MM -MD -MT $$@ \
                           $$(call filter_gcc_cppflags,$3 $(CFLAGS) $(SRC_CFLAGS) $$(PREREQ_CFLAGS) $$(SRC_VAR_CFLAGS)) \
                           $(call prepend_gcc_cppflags,$(4)) \
