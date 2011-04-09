@@ -30,16 +30,16 @@ endef
 
 # 1 = target name
 define prereq_libraries
-$(foreach prereq_lib,$(call preshlibs,$1),$(dollar)$$($(prereq_lib)_shlib_target))
+$(foreach prereq_lib,$(call shlibs,$1),$(dollar)$$($(prereq_lib)_shlib_target))
 endef
 
 
 # returns a list of data associated with prerequisite libraries
 
 # 1 = list of prerequisite libraries
-# 2 = data to get i.e. (preshilb_list, preshlib_dirs)
-define prelibrary_info
-$(foreach prereq_lib,$(1),$(call $(prereq_lib)_$(2)))
+# 2 = data to get i.e. (dir)
+define library_info
+$(foreach prereq_lib,$(1),$($(prereq_lib)_$(2)))
 endef
 
 
@@ -94,6 +94,13 @@ $(patsubst %,-L%,$1)
 endef
 
 
+# Prepends the rpath-link flag to a list of libraries passed in
+
+# 1 = list of library directories
+define prepend_gcc_rpath_link
+$(foreach dir,$(1),-Wl$(comma)-rpath-link$(comma)$(dir))
+endef
+
 # Prepends the necessary gcc flags to a list of libraries to link
 # against
 
@@ -115,10 +122,11 @@ $(call $(1),$$(strip $(2)\
             $$(TARGET_CFLAGS)\
             $$(TARGET_LIBDIRS)\
             $(3)\
-            $$(call prepend_gcc_libdirs,$$(call prelibrary_info,$$(TARGET_PRESHLIBS),preshlib_dirs))),\
+            $(call prepend_gcc_libdirs,$(LIBDIRS))\
+            $(call prepend_gcc_rpath_link,$(LIBDIRS))\
+            $$(call prepend_gcc_libdirs,$$(call library_info,$$(TARGET_SHLIBS),dir))),\
             $$(strip $(4)\
-            $$(call prepend_gcc_link_shlibs,$$(call prelibrary_info,$$(TARGET_PRESHLIBS),preshlib_list)) \
-            $$(TARGET_SHLIBS)),\
+            $$(call prepend_gcc_link_shlibs,$$(TARGET_SHLIBS))),\
             $$@,$$(filter %.$(obj_file_suffix),$$^))
 endef
 
@@ -236,8 +244,7 @@ $(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call src_incdirs,$1))
 $(2): PREREQ_CFLAGS := $(call src_cflags,$1)
 $(2): PREREQ_CPPFLAGS := $(call prepend_gcc_cppflags,$(call src_cppflags,$1))
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
-$(2): TARGET_SHLIBS := $(call prepend_gcc_link_shlibs,$(call shlibs,$1))
-$(2): TARGET_PRESHLIBS := $(call preshlibs,$1)
+$(2): TARGET_SHLIBS := $(call shlibs,$1)
 
 endef
 
@@ -326,16 +333,6 @@ $(1)_dir := $(dir $(2))
 # prerequisites such that the library builds before the targets that
 # require it
 $(1)_shlib_target := $(2)
-
-# generates the prelibs recursively
-define $(1)_preshlib_list
-$(1) $(foreach preshlib,$(call preshlibs,$(1)),$$(call $(preshlib)_preshlib_list))
-endef
-
-# generates the prelib directories recursively
-define $(1)_preshlib_dirs
-$(dir $(2)) $(foreach preshlib,$(call preshlibs,$(1)),$$(call $(preshlib)_preshlib_dirs))
-endef
 
 
 # library rules
