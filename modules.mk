@@ -382,7 +382,7 @@ endif
 
 
 # generate the rules for the object files
-$(foreach src,$(3),$(call cxx_obj_rule,$(src),$(obj_file_suffix),-fPIC))
+$(foreach src,$(3),$(call cxx_obj_rule,$(src),$(obj_file_suffix),$(fpic_option)))
 
 $(call reset_attributes,$1)
 endef
