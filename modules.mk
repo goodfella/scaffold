@@ -352,7 +352,7 @@ $(call soname,$(1),$(2)): $(call realname,$(1),$(2))
 	$(call create_shlib_symlink)
 
 # /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
-$(call realname,$(1),$(2)): $(call prereq_libraries,$1) $(4) | $(call pre_rule,$1)
+$(call realname,$(1),$(2)): $(call prereq_libraries,$1) $(4) | $(call pre_rules,$1)
 	$(call link_cxx_shlib,$(call soname,$(1),$(notdir $(2))))
 
 
@@ -366,7 +366,7 @@ $(2): $(call soname,$(1),$(2))
 	$(call create_shlib_symlink)
 
 # /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
-$(call soname,$(1),$(2)): $(call prereq_libraries,$1) $(4) | $(call pre_rule,$1)
+$(call soname,$(1),$(2)): $(call prereq_libraries,$1) $(4) | $(call pre_rules,$1)
 	$(call link_cxx_shlib,$(call soname,$(1),$(notdir $(2))))
 
 endif
@@ -375,7 +375,7 @@ endif
 else
 
 # /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
-$(2): $(call prereq_libraries,$1) $(4) | $(call pre_rule,$1)
+$(2): $(call prereq_libraries,$1) $(4) | $(call pre_rules,$1)
 	$(call link_cxx_shlib,)
 
 endif
