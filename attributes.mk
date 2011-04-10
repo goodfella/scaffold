@@ -69,18 +69,18 @@ endef
 
 # compiler flags to apply to all sources specified in the srcs
 # attribute
-define src_cflags
+define srcs_cflags
 $(call attribute,$1,$0)
 endef
 
 # cpp flags to apply to all source specified in the srcs attribute
-define src_cppflags
+define srcs_cppflags
 $(call attribute,$1,$0)
 endef
 
 # source incdirs to apply to all sources specified in the srcs
 # attribute
-define src_incdirs
+define srcs_incdirs
 $(call attribute,$1,$0)
 endef
 
@@ -123,8 +123,9 @@ $(1)_incdirs :=
 $(1)_libdirs :=
 $(1)_shlibs :=
 $(1)_srcs :=
-$(1)_src_cflags :=
-$(1)_src_cppflags :=
+$(1)_srcs_cflags :=
+$(1)_srcs_cppflags :=
+$(1)_srcs_incdirs :=
 $(1)_version :=
 $(1)_minor :=
 $(1)_release :=

@@ -240,9 +240,9 @@ endef
 define create_target_vars
 
 $(2): TARGET_CFLAGS := $(call cflags,$1)
-$(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call src_incdirs,$1))
-$(2): PREREQ_CFLAGS := $(call src_cflags,$1)
-$(2): PREREQ_CPPFLAGS := $(call prepend_gcc_cppflags,$(call src_cppflags,$1))
+$(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call srcs_incdirs,$1))
+$(2): PREREQ_CFLAGS := $(call srcs_cflags,$1)
+$(2): PREREQ_CPPFLAGS := $(call prepend_gcc_cppflags,$(call srcs_cppflags,$1))
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
 $(2): TARGET_SHLIBS := $(call shlibs,$1)
 
