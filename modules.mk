@@ -43,6 +43,15 @@ $(foreach prereq_lib,$(1),$($(prereq_lib)_$(2)))
 endef
 
 
+# generates the prerequisites for a given target
+
+# 1 = target
+# 2 = target object files
+define target_prereqs
+$(call prereq_libraries,$1) $(2) | $(call pre_rules,$1)
+endef
+
+
 # returns an object file given a source file
 
 # 1 = source file
@@ -294,11 +303,10 @@ $(call add_object_files,$(4))
 
 
 # rule to create the program.  The dependencies are the object files
-# obtained from the source files, and the prelibs, and pre_rules
-# specified in the module.mk
+# obtained from the source files, and the shlibs and libs, and
+# pre_rules specified in the module.mk
 
-# /path/to/program : <prelibs> <object files> | <pre-rules>
-$(2): $(call prereq_libraries,$1) $(4) | $(call pre_rules,$1)
+$(2): $(call target_prereqs,$1,$4)
 	$(call link_cxx_program)
 
 # generate the rules for each object file
@@ -351,8 +359,7 @@ $(2): $(call soname,$(1),$(2))
 $(call soname,$(1),$(2)): $(call realname,$(1),$(2))
 	$(call create_shlib_symlink)
 
-# /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
-$(call realname,$(1),$(2)): $(call prereq_libraries,$1) $(4) | $(call pre_rules,$1)
+$(call realname,$(1),$(2)): $(call target_prereqs,$1,$4)
 	$(call link_cxx_shlib,$(call soname,$(1),$(notdir $(2))))
 
 
@@ -365,8 +372,7 @@ shlib_clean += $(call soname,$(1),$(2))
 $(2): $(call soname,$(1),$(2))
 	$(call create_shlib_symlink)
 
-# /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
-$(call soname,$(1),$(2)): $(call prereq_libraries,$1) $(4) | $(call pre_rules,$1)
+$(call soname,$(1),$(2)): $(call target_prereqs,$1,$4)
 	$(call link_cxx_shlib,$(call soname,$(1),$(notdir $(2))))
 
 endif
@@ -374,8 +380,7 @@ endif
 # no version just build linker name
 else
 
-# /path/to/lib/library-real-name: <prelibs> <object files> | <pre_rule>
-$(2): $(call prereq_libraries,$1) $(4) | $(call pre_rules,$1)
+$(2): $(call target_prereqs,$1,$4)
 	$(call link_cxx_shlib,)
 
 endif
