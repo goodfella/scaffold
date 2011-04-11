@@ -22,6 +22,13 @@ object_files += $1
 dependencies += $(addsuffix $(depends_file_suffix), $1)
 endef
 
+# appends the list of sources to the sources variable
+
+# 1 = source files
+define add_source_files
+sources += $1
+endef
+
 
 # clears out the local module variables
 define reset_module_vars
