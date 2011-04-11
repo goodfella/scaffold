@@ -329,7 +329,7 @@ $(if $(3),,$(error shared library $(1) is missing a $(1)_srcs variable))
 
 $(call create_target_vars,$(1),$(2))
 
-cxx_shlibs += $(2)
+LIBRARIES += $(2)
 $(call add_sources,$(3))
 $(call add_object_files,$(4))
 

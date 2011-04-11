@@ -36,9 +36,6 @@ sources :=
 # all the C++ programs
 cxx_progs :=
 
-# all the C++ shared libraries
-cxx_shlibs :=
-
 
 # 1 = module path
 define create_module_targets
@@ -60,7 +57,7 @@ ifneq ($(MAKECMDGOALS),clean)
 -include $(dependencies)
 endif
 
-libraries: $(cxx_shlibs)
+libraries: $(LIBRARIES)
 programs: $(cxx_progs)
 
 
@@ -71,7 +68,7 @@ clean-build:
 
 # removes the targets
 clean-targets:
-	rm -f $(cxx_progs) $(cxx_shlibs) $(shlib_clean)
+	rm -f $(cxx_progs) $(LIBRARIES) $(shlib_clean)
 
 
 # removes all the files specified in the clean_files variable
