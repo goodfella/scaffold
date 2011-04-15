@@ -268,10 +268,8 @@ $(foreach src,$(local_srcs),$(call src_vars,$(src),\
 
 
 # create the rules for the C++ shared libraries
-$(foreach shlib,$(local_cxx_shlibs),$(call cxx_shlib_rule,$(shlib),\
-                                                          $(call linker_name,$(call relpath,$(shlib))),\
-                                                          $(call relpath,$(call srcs,$(shlib))),\
-                                                          $(call obj_files,$(call relpath,$(call srcs,$(shlib))),$(obj_file_suffix))))
+$(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),$(module_dir),$(call relpath,$(call srcs,$(shlib))),link_cxx_shlib,cxx_obj_rule,1))
+
 
 # # create the rules for the C++ programs defined in the module
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
@@ -283,6 +281,99 @@ $(call reset_module_vars)
 
 endef
 
+
+# processes libraries both static and shared
+
+# 1 = library name
+# 2 = library directory
+# 3 = full pathed sources
+# 4 = library link command
+# 5 = object file command
+# 6 = build shlib flag
+define process_library
+
+$(1)_dir := $2
+$(call add_sources,$3)
+
+ifneq ($6,)
+$(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$(obj_file_suffix)),$4,$5)
+endif
+
+$(call reset_attributes,$1)
+
+endef
+
+
+# creates the rule for a shared library
+
+# 1 = shared library name
+# 2 = shared library full pathed linker name
+# 3 = full pathed sources
+# 4 = full pathed object files
+# 5 = shared library linker command
+# 6 = object file command
+define create_shlib_rule
+
+# check if srcs variable is set
+$(if $(3),,$(error shared library $(1) is missing a $(1)_srcs variable))
+
+$(call add_library,$2)
+$(call add_object_files,$4)
+$(call create_target_vars,$(1),$2)
+
+# used by programs and other libraries to list the necessary
+# prerequisites such that the library builds before the targets that
+# require it
+$(1)_shlib_target := $(2)
+
+
+# library rules
+
+ifneq ($(call version,$(1)),)
+
+# we have a version number and a minor number, so the linker name depends on the
+# soname and the soname depends on the real name
+ifneq ($(call minor,$(1)),)
+
+shlib_clean += $(call soname,$(1),$(2)) $(call realname,$(1),$(2))
+
+$(2): $(call soname,$(1),$(2))
+	$(call create_shlib_symlink)
+
+$(call soname,$(1),$(2)): $(call realname,$(1),$(2))
+	$(call create_shlib_symlink)
+
+$(call realname,$(1),$(2)): $(call target_prereqs,$1,$4)
+	$(call $5,$(call soname,$(1),$(notdir $(2))))
+
+
+# we have a version number without a minor number, so the linker name
+# depends on a soname
+else
+
+shlib_clean += $(call soname,$(1),$(2))
+
+$(2): $(call soname,$(1),$(2))
+	$(call create_shlib_symlink)
+
+$(call soname,$(1),$(2)): $(call target_prereqs,$1,$4)
+	$(call $5,$(call soname,$(1),$(notdir $(2))))
+
+endif
+
+# no version just build linker name
+else
+
+$(2): $(call target_prereqs,$1,$4)
+	$(call $5,)
+
+endif
+
+
+# generate the rules for the object files
+$(foreach src,$(3),$(call $6,$(src),$(obj_file_suffix),$(fpic_option)))
+
+endef
 
 # creates the rule for a C++ program
 
@@ -311,83 +402,6 @@ $(2): $(call target_prereqs,$1,$4)
 
 # generate the rules for each object file
 $(foreach src,$(3),$(call cxx_obj_rule,$(src),$(obj_file_suffix),))
-
-$(call reset_attributes,$1)
-endef
-
-
-# rule to create C++ shared libraries.
-
-# 1 = shared library name
-# 2 = shared library linker name path
-# 3 = full pathed sources
-# 4 = full pathed object files
-define cxx_shlib_rule
-
-# check if srcs variable is set
-$(if $(3),,$(error shared library $(1) is missing a $(1)_srcs variable))
-
-$(call create_target_vars,$(1),$(2))
-
-LIBRARIES += $(2)
-$(call add_sources,$(3))
-$(call add_object_files,$(4))
-
-
-# used by programs to get the directory which contains the library
-$(1)_dir := $(dir $(2))
-
-# used by programs and other libraries to list the necessary
-# prerequisites such that the library builds before the targets that
-# require it
-$(1)_shlib_target := $(2)
-
-
-# library rules
-
-ifneq ($(call version,$(1)),)
-
-# we have a version number and a minor number, so the linker name depends on the
-# soname and the soname depends on the real name
-ifneq ($(call minor,$(1)),)
-
-shlib_clean += $(call soname,$(1),$(2)) $(call realname,$(1),$(2))
-
-$(2): $(call soname,$(1),$(2))
-	$(call create_shlib_symlink)
-
-$(call soname,$(1),$(2)): $(call realname,$(1),$(2))
-	$(call create_shlib_symlink)
-
-$(call realname,$(1),$(2)): $(call target_prereqs,$1,$4)
-	$(call link_cxx_shlib,$(call soname,$(1),$(notdir $(2))))
-
-
-# we have a version number without a minor number, so the linker name
-# depends on a soname
-else
-
-shlib_clean += $(call soname,$(1),$(2))
-
-$(2): $(call soname,$(1),$(2))
-	$(call create_shlib_symlink)
-
-$(call soname,$(1),$(2)): $(call target_prereqs,$1,$4)
-	$(call link_cxx_shlib,$(call soname,$(1),$(notdir $(2))))
-
-endif
-
-# no version just build linker name
-else
-
-$(2): $(call target_prereqs,$1,$4)
-	$(call link_cxx_shlib,)
-
-endif
-
-
-# generate the rules for the object files
-$(foreach src,$(3),$(call cxx_obj_rule,$(src),$(obj_file_suffix),$(fpic_option)))
 
 $(call reset_attributes,$1)
 endef

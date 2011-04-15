@@ -30,6 +30,14 @@ sources += $1
 endef
 
 
+# appends the library to the list of libraries
+
+# 1 = library full path
+define add_library
+LIBRARIES += $1
+endef
+
+
 # clears out the local module variables
 define reset_module_vars
 
