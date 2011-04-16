@@ -28,15 +28,6 @@ include $(scaffold_dir)module-helper.mk
 include $(scaffold_dir)modules.mk
 
 
-# these are variables filled in by the module.mk files
-
-# all the sources
-sources :=
-
-# all the C++ programs
-cxx_progs :=
-
-
 # 1 = module path
 define create_module_targets
 $(eval include $(1))
