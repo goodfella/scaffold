@@ -127,7 +127,7 @@ endef
 # 4 = link libraries
 define link_target
 $(call $(1),$$(strip $(2)\
-            $(CFLAGS)\
+            $$(CFLAGS)\
             $$(TARGET_CFLAGS)\
             $$(TARGET_LIBDIRS)\
             $(3)\
@@ -147,14 +147,14 @@ endef
 # 3 = lib dirs
 # 4 = libs
 define link_program
-$(call link_target,$1,$2 $(PROG_CFLAGS),$3,$4)
+$(call link_target,$1,$2 $$(PROG_CFLAGS),$3,$4)
 endef
 
 
 # compiler command for a c++ program
 
 define link_cxx_program
-$(call link_program,gxx,$(CXXFLAGS) $(PROG_CXXFLAGS),,)
+$(call link_program,gxx,$$(CXXFLAGS) $$(PROG_CXXFLAGS),,)
 endef
 
 
@@ -167,7 +167,7 @@ endef
 # 5 = libs
 define link_shlib
 $(call link_target,$1,-shared $(if $(2),-Wl$(comma)-soname$(comma)$(2))\
-                   $3 $(SHLIB_CFLAGS),\
+                   $3 $$(SHLIB_CFLAGS),\
                    $(4),\
                    $5)
 endef
@@ -177,7 +177,7 @@ endef
 
 # 1 = soname of shared library
 define link_cxx_shlib
-$(call link_shlib,gxx,$1,$(CXXFLAGS) $(SHLIB_CXXFLAGS),,)
+$(call link_shlib,gxx,$1,$$(CXXFLAGS) $$(SHLIB_CXXFLAGS),,)
 endef
 
 
@@ -201,35 +201,36 @@ endef
 define obj_rule
 $(call obj_file,$(1),$(2)) :
 	$(call gxx_noabbrv,$$(strip -M -MM -MD -MT $$@ \
-                          $$(call filter_gcc_cppflags,$3 $(CFLAGS) $(SRC_CFLAGS) $$(PREREQ_CFLAGS) $$(SRC_VAR_CFLAGS)) \
-                          $(call prepend_gcc_cppflags,$(4)) \
-                          $(call prepend_gcc_cppflags,$(CPPFLAGS)) \
-                          $(call prepend_gcc_cppflags,$(SRC_CPPFLAGS)) \
+                          $$(call filter_gcc_cppflags,$3 $$(CFLAGS) $$(SRC_CFLAGS) $$(PREREQ_CFLAGS) $$(SRC_VAR_CFLAGS)) \
+                          $$(call prepend_gcc_cppflags,$(4)) \
+                          $$(call prepend_gcc_cppflags,$$(CPPFLAGS)) \
+                          $$(call prepend_gcc_cppflags,$$(SRC_CPPFLAGS)) \
                           $$(PREREQ_CPPFLAGS) \
                           $$(SRC_VAR_CPPFLAGS) \
-                          $(call prepend_gcc_incdirs,$(5)) \
-                          $(call prepend_gcc_incdirs,$(INCDIRS)) \
-                          $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
+                          $$(call prepend_gcc_incdirs,$(5)) \
+                          $$(call prepend_gcc_incdirs,$$(INCDIRS)) \
+                          $$(call prepend_gcc_incdirs,$$(SRC_INCDIRS)) \
                           $$(PREREQ_INCDIRS) \
                           $$(SRC_VAR_INCDIRS)),, \
                           $(addsuffix .d,$$@),$1)
 
 	$(call gxx,$$(strip $3 \
-                   $(CFLAGS) \
-                   $(SRC_CFLAGS) \
+                   $$(CFLAGS) \
+                   $$(SRC_CFLAGS) \
                    $$(PREREQ_CFLAGS) \
                    $$(SRC_VAR_CFLAGS) \
-                   $(call prepend_gcc_cppflags,$(4)) \
-                   $(call prepend_gcc_cppflags,$(CPPFLAGS)) \
-                   $(call prepend_gcc_cppflags,$(SRC_CPPFLAGS)) \
+                   $$(call prepend_gcc_cppflags,$(4)) \
+                   $$(call prepend_gcc_cppflags,$$(CPPFLAGS)) \
+                   $$(call prepend_gcc_cppflags,$$(SRC_CPPFLAGS)) \
                    $$(PREREQ_CPPFLAGS) \
                    $$(SRC_VAR_CPPFLAGS) \
-                   $(call prepend_gcc_incdirs,$(5)) \
-                   $(call prepend_gcc_incdirs,$(INCDIRS)) \
-                   $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
+                   $$(call prepend_gcc_incdirs,$(5)) \
+                   $$(call prepend_gcc_incdirs,$$(INCDIRS)) \
+                   $$(call prepend_gcc_incdirs,$$(SRC_INCDIRS)) \
                    $$(PREREQ_INCDIRS) \
                    $$(SRC_VAR_INCDIRS) \
                    $6 -c),,$$@,$1)
+
 endef
 
 # creates the object file rule for a C++ source file
@@ -238,7 +239,7 @@ endef
 # 2 = object file suffix
 # 3 = extra gcc args
 define cxx_obj_rule
-$(call obj_rule,$1,$2,$(CXXFLAGS) $(SRC_CXXFLAGS),,,$3)
+$(call obj_rule,$1,$2,$$(CXXFLAGS) $$(SRC_CXXFLAGS),,,$3)
 endef
 
 
