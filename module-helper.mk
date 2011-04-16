@@ -38,6 +38,14 @@ LIBRARIES += $1
 endef
 
 
+# appends the program to the list of programs
+
+# 1 = program full path
+define add_program
+PROGRAMS += $1
+endef
+
+
 # clears out the local module variables
 define reset_module_vars
 

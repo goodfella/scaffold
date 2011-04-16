@@ -389,7 +389,7 @@ $(if $(3),,$(error program $(1) is missing a $(1)_srcs variable))
 
 $(call create_target_vars,$(1),$(2))
 
-cxx_progs += $(2)
+$(call add_program,$(2))
 $(call add_sources,$(3))
 $(call add_object_files,$(4))
 
