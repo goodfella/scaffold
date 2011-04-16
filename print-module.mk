@@ -6,8 +6,8 @@ include $(scaffold_dir)module-helper.mk
 include $(scaffold_dir)modules.mk
 
 
-print-module:;
+%.mk:
 
-include $(MODULE)
+include $(MAKECMDGOALS)
 
 $(info $(call process_module_targets))

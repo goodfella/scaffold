@@ -67,3 +67,7 @@ clean-files:
 	$(if $(clean_files),rm -f $(clean_files),)
 
 clean-all: clean-build clean-targets clean-files
+
+%.mk.out: %.mk
+	cat $^
+	@$(MAKE) -s -f $(scaffold_dir)print-module.mk $^
