@@ -44,7 +44,7 @@ $(foreach module,$(SCAFFOLD_MODULES),$(eval $(call create_module_targets,$(modul
 .PHONY: scaffold-clean-build scaffold-clean-targets scaffold-clean-files clean scaffold_programs scaffold_libraries
 
 
-ifneq ($(MAKECMDGOALS),clean)
+ifeq ($(filter clean%,$(MAKECMDGOALS)),)
 -include $(SCAFFOLD_DEPENDENCIES)
 endif
 
