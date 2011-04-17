@@ -18,15 +18,15 @@ endef
 
 # 1 = object files
 define add_object_files
-object_files += $1
-dependencies += $(addsuffix $(depends_file_suffix), $1)
+SCAFFOLD_OBJ_FILES += $1
+SCAFFOLD_DEPENDENCIES += $(addsuffix $(SCAFFOLD_DEPENDS_SUFFIX), $1)
 endef
 
 # appends the list of sources to the sources variable
 
 # 1 = source files
 define add_source_files
-sources += $1
+SCAFFOLD_SOURCES += $1
 endef
 
 
@@ -34,7 +34,7 @@ endef
 
 # 1 = library full path
 define add_library
-LIBRARIES += $1
+SCAFFOLD_LIBRARIES += $1
 endef
 
 
@@ -42,7 +42,7 @@ endef
 
 # 1 = program full path
 define add_program
-PROGRAMS += $1
+SCAFFOLD_PROGRAMS += $1
 endef
 
 
@@ -54,4 +54,12 @@ local_cxx_shlibs :=
 local_srcs :=
 local_plugs :=
 
+endef
+
+
+# adds files to clean when targets are cleaned
+
+# 1 = path to file
+define add_target_clean
+SCAFFOLD_TARGET_CLEAN += $1
 endef

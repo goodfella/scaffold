@@ -2,9 +2,9 @@
 
 # global variables used by the build system
 
-obj_file_suffix := o
-fpic_option ?= -fPIC
-depends_file_suffix := .d
+SCAFFOLD_OBJ_SUFFIX := o
+SCAFFOLD_FPIC ?= -fPIC
+SCAFFOLD_DEPENDS_SUFFIX := .d
 
 semi_colon := ;
 comma := ,

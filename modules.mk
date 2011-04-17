@@ -136,7 +136,7 @@ $(call $(1),$$(strip $(2)\
             $$(call prepend_gcc_libdirs,$$(call library_info,$$(TARGET_SHLIBS),dir))),\
             $$(strip $(4)\
             $$(call prepend_gcc_link_shlibs,$$(TARGET_SHLIBS))),\
-            $$@,$$(filter %.$(obj_file_suffix),$$^))
+            $$@,$$(filter %.$(SCAFFOLD_OBJ_SUFFIX),$$^))
 endef
 
 
@@ -265,7 +265,7 @@ define process_module_targets
 
 # creates variables for source attributes
 $(foreach src,$(local_srcs),$(call src_vars,$(src),\
-                                            $(call obj_file,$(call relpath,$(src)),$(obj_file_suffix))))
+                                            $(call obj_file,$(call relpath,$(src)),$(SCAFFOLD_OBJ_SUFFIX))))
 
 
 # create the rules for the C++ shared libraries
@@ -276,7 +276,7 @@ $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),$(module_dir
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
                                                        $(call relpath,$(prog)),\
                                                        $(call relpath,$(call srcs,$(prog))),\
-                                                       $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(obj_file_suffix))))
+                                                       $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(SCAFFOLD_OBJ_SUFFIX))))
 
 $(call reset_module_vars)
 
@@ -297,7 +297,7 @@ $(1)_dir := $2
 $(call add_sources,$3)
 
 ifneq ($6,)
-$(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$(obj_file_suffix)),$4,$5)
+$(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$(SCAFFOLD_OBJ_SUFFIX)),$4,$5)
 endif
 
 $(call reset_attributes,$1)
@@ -336,7 +336,7 @@ ifneq ($(call version,$(1)),)
 # soname and the soname depends on the real name
 ifneq ($(call minor,$(1)),)
 
-shlib_clean += $(call soname,$(1),$(2)) $(call realname,$(1),$(2))
+$(call add_target_clean,$(call soname,$(1),$(2)) $(call realname,$(1),$(2)))
 
 $(2): $(call soname,$(1),$(2))
 	$(call create_shlib_symlink)
@@ -352,7 +352,7 @@ $(call realname,$(1),$(2)): $(call target_prereqs,$1,$4)
 # depends on a soname
 else
 
-shlib_clean += $(call soname,$(1),$(2))
+$(call add_target_clean,$(call soname,$(1),$(2)))
 
 $(2): $(call soname,$(1),$(2))
 	$(call create_shlib_symlink)
@@ -372,7 +372,7 @@ endif
 
 
 # generate the rules for the object files
-$(foreach src,$(3),$(call $6,$(src),$(obj_file_suffix),$(fpic_option)))
+$(foreach src,$(3),$(call $6,$(src),$(SCAFFOLD_OBJ_SUFFIX),$(SCAFFOLD_FPIC)))
 
 endef
 
@@ -402,7 +402,7 @@ $(2): $(call target_prereqs,$1,$4)
 	$(call link_cxx_program)
 
 # generate the rules for each object file
-$(foreach src,$(3),$(call cxx_obj_rule,$(src),$(obj_file_suffix),))
+$(foreach src,$(3),$(call cxx_obj_rule,$(src),$(SCAFFOLD_OBJ_SUFFIX),))
 
 $(call reset_attributes,$1)
 endef
