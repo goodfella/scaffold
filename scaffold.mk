@@ -41,7 +41,7 @@ $(foreach module,$(SCAFFOLD_MODULES),$(eval $(call create_module_targets,$(modul
 
 # clean_files: files to delete with the clean-files target
 
-.PHONY: scaffold-clean-build scaffold-clean-targets scaffold-clean-files clean-all scaffold_programs scaffold_libraries
+.PHONY: scaffold-clean-build scaffold-clean-targets scaffold-clean-files clean scaffold_programs scaffold_libraries
 
 
 ifneq ($(MAKECMDGOALS),clean)
@@ -65,7 +65,7 @@ scaffold-clean-targets:
 scaffold-clean-files:
 	$(if $(SCAFFOLD_CLEAN_FILES),rm -f $(SCAFFOLD_CLEAN_FILES),)
 
-clean-all: scaffold-clean-build scaffold-clean-targets scaffold-clean-files
+clean: scaffold-clean-build scaffold-clean-targets scaffold-clean-files
 
 %.mk.out: %.mk
 	cat $^
