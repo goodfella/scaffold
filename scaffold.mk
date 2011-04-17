@@ -39,7 +39,6 @@ endef
 # create the targets
 $(foreach module,$(SCAFFOLD_MODULES),$(eval $(call create_module_targets,$(module))))
 
-# clean_files: files to delete with the clean-files target
 
 .PHONY: scaffold-clean-build scaffold-clean-targets scaffold-clean-files clean scaffold_programs scaffold_libraries
 
