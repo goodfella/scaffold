@@ -31,7 +31,7 @@ include $(SCAFFOLD_DIR)modules.mk
 # 1 = module path
 define create_module_targets
 $(eval include $(1))
-$(call process_module_targets)
+$(call process_module_targets,$1)
 endef
 
 

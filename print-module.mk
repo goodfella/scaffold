@@ -10,4 +10,4 @@ include $(scaffold_dir)modules.mk
 
 include $(MAKECMDGOALS)
 
-$(info $(call process_module_targets))
+$(info $(call process_module_targets,$(MAKECMDGOALS)))

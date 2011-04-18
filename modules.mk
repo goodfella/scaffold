@@ -47,8 +47,9 @@ endef
 
 # 1 = target
 # 2 = target object files
+# 3 = module path
 define target_prereqs
-$(call prereq_libraries,$1) $(2) | $(call pre_rules,$1)
+$(call prereq_libraries,$1) $(2) $3 | $(call pre_rules,$1)
 endef
 
 
@@ -261,6 +262,7 @@ endef
 
 # sets up the neccessary targets for the objects defined in a
 # module.mk
+# 1 = module
 define process_module_targets
 
 # creates variables for source attributes
@@ -269,14 +271,15 @@ $(foreach src,$(local_srcs),$(call src_vars,$(src),\
 
 
 # create the rules for the C++ shared libraries
-$(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),$(module_dir),$(call relpath,$(call srcs,$(shlib))),link_cxx_shlib,cxx_obj_rule,1))
+$(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),$(module_dir),$(call relpath,$(call srcs,$(shlib))),link_cxx_shlib,cxx_obj_rule,1,$1))
 
 
 # # create the rules for the C++ programs defined in the module
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
                                                        $(call relpath,$(prog)),\
                                                        $(call relpath,$(call srcs,$(prog))),\
-                                                       $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(SCAFFOLD_OBJ_SUFFIX))))
+                                                       $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(SCAFFOLD_OBJ_SUFFIX)),\
+                                                       $1))
 
 $(call reset_module_vars)
 
@@ -291,13 +294,14 @@ endef
 # 4 = library link command
 # 5 = object file command
 # 6 = build shlib flag
+# 7 = module path
 define process_library
 
 $(1)_dir := $2
 $(call add_sources,$3)
 
 ifneq ($6,)
-$(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$(SCAFFOLD_OBJ_SUFFIX)),$4,$5)
+$(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$(SCAFFOLD_OBJ_SUFFIX)),$4,$5,$7)
 endif
 
 $(call reset_attributes,$1)
@@ -313,6 +317,7 @@ endef
 # 4 = full pathed object files
 # 5 = shared library linker command
 # 6 = object file command
+# 7 = module path
 define create_shlib_rule
 
 # check if srcs variable is set
@@ -344,7 +349,7 @@ $(2): $(call soname,$(1),$(2))
 $(call soname,$(1),$(2)): $(call realname,$(1),$(2))
 	$(call create_shlib_symlink)
 
-$(call realname,$(1),$(2)): $(call target_prereqs,$1,$4)
+$(call realname,$(1),$(2)): $(call target_prereqs,$1,$4,$7)
 	$(call $5,$(call soname,$(1),$(notdir $(2))))
 
 
@@ -357,7 +362,7 @@ $(call add_target_clean,$(call soname,$(1),$(2)))
 $(2): $(call soname,$(1),$(2))
 	$(call create_shlib_symlink)
 
-$(call soname,$(1),$(2)): $(call target_prereqs,$1,$4)
+$(call soname,$(1),$(2)): $(call target_prereqs,$1,$4,$7)
 	$(call $5,$(call soname,$(1),$(notdir $(2))))
 
 endif
@@ -365,7 +370,7 @@ endif
 # no version just build linker name
 else
 
-$(2): $(call target_prereqs,$1,$4)
+$(2): $(call target_prereqs,$1,$4,$7)
 	$(call $5,)
 
 endif
@@ -382,6 +387,7 @@ endef
 # 2 = program full path
 # 3 = full pathed program sources
 # 4 = full pathed program object files
+# 5 = module path
 define cxx_prog_rule
 
 # checks to make sure a srcs variable is declared
@@ -398,7 +404,7 @@ $(call add_object_files,$(4))
 # obtained from the source files, and the shlibs and libs, and
 # pre_rules specified in the module.mk
 
-$(2): $(call target_prereqs,$1,$4)
+$(2): $(call target_prereqs,$1,$4,$5)
 	$(call link_cxx_program)
 
 # generate the rules for each object file
