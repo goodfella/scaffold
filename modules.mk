@@ -127,15 +127,15 @@ endef
 # 3 = lib dirs
 # 4 = link libraries
 define link_target
-$(call $(1),$$(strip $(2)\
-            $$(CFLAGS)\
-            $$(TARGET_CFLAGS)\
-            $$(TARGET_LIBDIRS)\
+$(call $(1),$(strip $(2)\
+            $(CFLAGS)\
+            $(TARGET_CFLAGS)\
+            $(TARGET_LIBDIRS)\
             $(3)\
             $(call prepend_gcc_libdirs,$(LIBDIRS))\
             $(call prepend_gcc_rpath_link,$(LIBDIRS))\
             $$(call prepend_gcc_libdirs,$$(call library_info,$$(TARGET_SHLIBS),dir))),\
-            $$(strip $(4)\
+            $(strip $(4)\
             $$(call prepend_gcc_link_shlibs,$$(TARGET_SHLIBS))),\
             $$@,$$(filter %.$(SCAFFOLD_OBJ_SUFFIX),$$^))
 endef
@@ -148,14 +148,14 @@ endef
 # 3 = lib dirs
 # 4 = libs
 define link_program
-$(call link_target,$1,$2 $$(PROG_CFLAGS),$3,$4)
+$(call link_target,$1,$2 $(PROG_CFLAGS),$3,$4)
 endef
 
 
 # compiler command for a c++ program
 
 define link_cxx_program
-$(call link_program,gxx,$$(CXXFLAGS) $$(PROG_CXXFLAGS),,)
+$(call link_program,gxx,$(CXXFLAGS) $(PROG_CXXFLAGS),,)
 endef
 
 
@@ -168,7 +168,7 @@ endef
 # 5 = libs
 define link_shlib
 $(call link_target,$1,-shared $(if $(2),-Wl$(comma)-soname$(comma)$(2))\
-                   $3 $$(SHLIB_CFLAGS),\
+                   $3 $(SHLIB_CFLAGS),\
                    $(4),\
                    $5)
 endef
@@ -178,7 +178,7 @@ endef
 
 # 1 = soname of shared library
 define link_cxx_shlib
-$(call link_shlib,gxx,$1,$$(CXXFLAGS) $$(SHLIB_CXXFLAGS),,)
+$(call link_shlib,gxx,$1,$(CXXFLAGS) $(SHLIB_CXXFLAGS),,)
 endef
 
 
