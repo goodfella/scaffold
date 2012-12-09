@@ -111,23 +111,3 @@ endef
 define pre_rules
 $(call attribute,$1,$0)
 endef
-
-
-# resets all attributes
-
-# 1 = object
-define reset_attributes
-$(1)_cflags :=
-$(1)_cppflags :=
-$(1)_incdirs :=
-$(1)_libdirs :=
-$(1)_shlibs :=
-$(1)_srcs :=
-$(1)_srcs_cflags :=
-$(1)_srcs_cppflags :=
-$(1)_srcs_incdirs :=
-$(1)_version :=
-$(1)_minor :=
-$(1)_release :=
-$(1)_pre_rules :=
-endef

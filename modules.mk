@@ -274,15 +274,16 @@ $(foreach src,$(local_srcs),$(call src_vars,$(src),\
 $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),$(module_dir),$(call relpath,$(call srcs,$(shlib))),link_cxx_shlib,cxx_obj_rule,1,$1))
 
 
-# # create the rules for the C++ programs defined in the module
+# create the rules for the C++ programs defined in the module
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
                                                        $(call relpath,$(prog)),\
                                                        $(call relpath,$(call srcs,$(prog))),\
                                                        $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(SCAFFOLD_OBJ_SUFFIX)),\
                                                        $1))
 
-$(call reset_module_vars)
-
+# Include the makefile that defines any additional rules for this
+# module
+-include $(module_dir)module-rules.mk
 endef
 
 
@@ -303,9 +304,6 @@ $(call add_sources,$3)
 ifneq ($6,)
 $(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$(SCAFFOLD_OBJ_SUFFIX)),$4,$5,$7)
 endif
-
-$(call reset_attributes,$1)
-
 endef
 
 
@@ -409,8 +407,6 @@ $(2): $(call target_prereqs,$1,$4,$5)
 
 # generate the rules for each object file
 $(foreach src,$(3),$(call cxx_obj_rule,$(src),$(SCAFFOLD_OBJ_SUFFIX),))
-
-$(call reset_attributes,$1)
 endef
 
 
@@ -424,5 +420,4 @@ define src_vars
 $(2): SRC_VAR_CFLAGS := $(call cflags,$1)
 $(2): SRC_VAR_INCDIRS := $(call prepend_gcc_incdirs,$(call incdirs,$1))
 $(2): SRC_VAR_CPPFLAGS := $(call prepend_gcc_cppflags,$(call cppflags,$1))
-$(call reset_attributes,$1)
 endef

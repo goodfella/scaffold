@@ -46,17 +46,6 @@ SCAFFOLD_PROGRAMS += $1
 endef
 
 
-# clears out the local module variables
-define reset_module_vars
-
-local_cxx_progs :=
-local_cxx_shlibs :=
-local_srcs :=
-local_plugs :=
-
-endef
-
-
 # adds files to clean when targets are cleaned
 
 # 1 = path to file
