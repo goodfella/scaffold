@@ -13,20 +13,38 @@ define relpath
 $(addprefix $(module_dir),$1)
 endef
 
-# appends object and dependency files to the object_files and
-# dependencies variables
 
-# 1 = object files
-define add_object_files
-SCAFFOLD_OBJ_FILES += $1
-SCAFFOLD_DEPENDENCIES += $(addsuffix $(SCAFFOLD_DEPENDS_SUFFIX), $1)
+# Returns precompiled module.mk paths
+
+# 1 = module.mk paths
+define precompiled_modules
+$(patsubst %.mk,%.pmk,$1)
 endef
 
-# appends the list of sources to the sources variable
 
-# 1 = source files
-define add_source_files
-SCAFFOLD_SOURCES += $1
+# Returns the depend files
+
+# 1 = list of object files
+define depend_files
+$(addsuffix $(SCAFFOLD_DEPENDS_SUFFIX),$1)
+endef
+
+# returns an object file given a source file
+
+# 1 = source file
+# 2 = object file suffix
+define obj_file
+$(addsuffix .$(2),$(basename $(1)))
+endef
+
+
+# returns a list of object files given a list of full pathed source
+# files
+
+# 1 = list of source files
+# 2 = object file suffix
+define obj_files
+$(foreach src,$(1),$(call obj_file,$(src),$(2)))
 endef
 
 
@@ -46,9 +64,58 @@ SCAFFOLD_PROGRAMS += $1
 endef
 
 
-# adds files to clean when targets are cleaned
+# Adds files to the module's clean target
 
-# 1 = path to file
-define add_target_clean
-SCAFFOLD_TARGET_CLEAN += $1
+# 1 = target name
+# 2 = files
+define add_clean_files
+$(module_dir)$(1)/clean: CLEAN_FILES += $2
+endef
+
+
+# Adds a target's clean rule
+
+# 1 = target name
+define add_clean_rule
+.PHONY: $(module_dir)$(1)/clean
+$(module_dir)clean: $(module_dir)$(1)/clean
+
+$(module_dir)$(1)/clean:
+	rm -f $$(CLEAN_FILES)
+endef
+
+
+# Adds a library's clean rule
+
+# 1 = lib target name
+# 2 = files
+define add_lib_clean_files
+$(call add_clean_files,lib-$(1),$2)
+endef
+
+
+# Adds a library's clean rule
+
+# 1 = lib target name
+define add_lib_clean_rule
+$(call add_clean_rule,lib-$(1))
+endef
+
+
+# Adds the depends files for a target
+
+# 1 = target name
+# 2 = depend file paths
+define add_depend_files
+$(call add_clean_files,$1,$2)
+SCAFFOLD_DEPENDENCIES += $2
+endef
+
+
+# Adds the depends files for a library target
+
+# 1 = target name
+# 2 = depend file paths
+define add_lib_depend_files
+$(call add_depend_files,lib-$(1),$2)
 endef

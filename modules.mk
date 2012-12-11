@@ -262,8 +262,20 @@ endef
 
 # sets up the neccessary targets for the objects defined in a
 # module.mk
-# 1 = module
+# 1 = module path
 define process_module_targets
+
+.PHONY: $(module_dir)clean $(module_dir)clean-pmk
+
+# The target clean rules are prerequisites of the module dir clean
+# rule
+clean: $(module_dir)clean
+
+# clean rule for removing the pmk files
+clean-pmk: $(module_dir)clean-pmk
+
+$(module_dir)clean-pmk:
+	rm -f $(call precompiled_modules,$1)
 
 # creates variables for source attributes
 $(foreach src,$(local_srcs),$(call src_vars,$(src),\
@@ -299,7 +311,6 @@ endef
 define process_library
 
 $(1)_dir := $2
-$(call add_sources,$3)
 
 ifneq ($6,)
 $(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$(SCAFFOLD_OBJ_SUFFIX)),$4,$5,$7)
@@ -322,8 +333,10 @@ define create_shlib_rule
 $(if $(3),,$(error shared library $(1) is missing a $(1)_srcs variable))
 
 $(call add_library,$2)
-$(call add_object_files,$4)
 $(call create_target_vars,$(1),$2)
+$(call add_lib_clean_rule,$1)
+$(call add_lib_clean_files,$1,$4)
+$(call add_lib_depend_files,$1,$(call depend_files,$(4)))
 
 # used by programs and other libraries to list the necessary
 # prerequisites such that the library builds before the targets that
@@ -339,7 +352,7 @@ ifneq ($(call version,$(1)),)
 # soname and the soname depends on the real name
 ifneq ($(call minor,$(1)),)
 
-$(call add_target_clean,$(call soname,$(1),$(2)) $(call realname,$(1),$(2)))
+$(call add_lib_clean_files,$1,$(call soname,$(1),$(2)) $(call realname,$(1),$(2)))
 
 $(2): $(call soname,$(1),$(2))
 	$(call create_shlib_symlink)
@@ -355,7 +368,7 @@ $(call realname,$(1),$(2)): $(call target_prereqs,$1,$4,$7)
 # depends on a soname
 else
 
-$(call add_target_clean,$(call soname,$(1),$(2)))
+$(call add_lib_clean_files,$1,$(call soname,$(1),$(2)))
 
 $(2): $(call soname,$(1),$(2))
 	$(call create_shlib_symlink)
@@ -367,6 +380,8 @@ endif
 
 # no version just build linker name
 else
+
+$(call add_lib_clean_files,$1,$2)
 
 $(2): $(call target_prereqs,$1,$4,$7)
 	$(call $5,)
@@ -394,8 +409,10 @@ $(if $(3),,$(error program $(1) is missing a $(1)_srcs variable))
 $(call create_target_vars,$(1),$(2))
 
 $(call add_program,$(2))
-$(call add_sources,$(3))
-$(call add_object_files,$(4))
+$(call add_clean_rule,$1)
+$(call add_clean_files,$1,$4)
+$(call add_depend_files,$1,$(call depend_files,$4))
+$(call add_clean_files,$1,$2)
 
 
 # rule to create the program.  The dependencies are the object files
