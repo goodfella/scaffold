@@ -53,25 +53,6 @@ $(call prereq_libraries,$1) $(2) $3 | $(call pre_rules,$1)
 endef
 
 
-# returns an object file given a source file
-
-# 1 = source file
-# 2 = object file suffix
-define obj_file
-$(addsuffix .$(2),$(basename $(1)))
-endef
-
-
-# returns a list of object files given a list of full pathed source
-# files
-
-# 1 = list of source files
-# 2 = object file suffix
-define obj_files
-$(foreach src,$(1),$(call obj_file,$(src),$(2)))
-endef
-
-
 # filters the cppflags to pass to gcc
 
 # 1 = flags that are passed to the compiler
