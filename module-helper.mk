@@ -2,9 +2,8 @@
 
 # functions used in all modules.mk's
 
-# directory the module is in
-module_dir = $(dir $(lastword $(MAKEFILE_LIST)))
-
+# The path to the module file relative to SCAFFOLD_SOURCE_DIR
+module_dir = $(patsubst $(SCAFFOLD_SOURCE_DIR)%,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
 # path relative to the top level Makefile
 # usage
@@ -13,6 +12,21 @@ define relpath
 $(addprefix $(module_dir),$1)
 endef
 
+
+# Full path taking into account the scaffold build directory
+
+# 1 = Relative path to the component
+define full_build_path
+$(foreach path,$1,$(SCAFFOLD_BUILD_DIR)$(module_dir)$(1))
+endef
+
+
+# Full source path taking into account the scaffold source directory
+
+# 1 = Relative path to component
+define full_source_path
+$(foreach path,$1,$(SCAFFOLD_SOURCE_DIR)$(module_dir)$(1))
+endef
 
 # Returns precompiled module.mk paths
 
@@ -34,7 +48,7 @@ endef
 # 1 = source file
 # 2 = object file suffix
 define obj_file
-$(addsuffix .$(2),$(basename $(1)))
+$(addprefix $(SCAFFOLD_BUILD_DIR),$(addsuffix .$(2),$(basename $(1))))
 endef
 
 

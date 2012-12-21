@@ -174,7 +174,7 @@ endef
 
 # creates the rule for an object file
 
-# 1 = source file path
+# 1 = source file path relative to the Makefile
 # 2 = object file suffix
 # 3 = cflags
 # 4 = cppflags
@@ -243,7 +243,7 @@ endef
 
 # sets up the neccessary targets for the objects defined in a
 # module.mk
-# 1 = module path
+# 1 = module path relative to the source directory
 define process_module_targets
 
 .PHONY: $(module_dir)clean $(module_dir)clean-pmk
@@ -256,7 +256,7 @@ clean: $(module_dir)clean
 clean-pmk: $(module_dir)clean-pmk
 
 $(module_dir)clean-pmk:
-	rm -f $(call precompiled_modules,$1)
+	rm -f $(call precompiled_modules,$(patsubst $(SCAFFOLD_SOURCE_DIR)%,$(SCAFFOLD_BUILD_DIR)%,$1))
 
 # creates variables for source attributes
 $(foreach src,$(local_srcs),$(call src_vars,$(src),\
@@ -264,12 +264,18 @@ $(foreach src,$(local_srcs),$(call src_vars,$(src),\
 
 
 # create the rules for the C++ shared libraries
-$(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),$(module_dir),$(call relpath,$(call srcs,$(shlib))),link_cxx_shlib,cxx_obj_rule,1,$1))
+$(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
+                                                           $(SCAFFOLD_BUILD_DIR)$(module_dir),\
+                                                           $(call relpath,$(call srcs,$(shlib))),\
+                                                           link_cxx_shlib,\
+                                                           cxx_obj_rule,\
+                                                           1,\
+                                                           $1))
 
 
 # create the rules for the C++ programs defined in the module
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
-                                                       $(call relpath,$(prog)),\
+                                                       $(call full_build_path,$(prog)),\
                                                        $(call relpath,$(call srcs,$(prog))),\
                                                        $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(SCAFFOLD_OBJ_SUFFIX)),\
                                                        $1))

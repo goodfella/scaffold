@@ -23,6 +23,12 @@ endif
 
 SCAFFOLD_DEPENDENCIES :=
 
+# Directory where make was invoked
+export SCAFFOLD_BUILD_DIR := $(CURDIR)/
+
+# Directory where the source code lives
+export SCAFFOLD_SOURCE_DIR := $(dir $(realpath $(filter %Makefile,$(MAKEFILE_LIST))))
+
 SCAFFOLD_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 include $(SCAFFOLD_DIR)variables.mk
 include $(SCAFFOLD_DIR)attributes.mk
