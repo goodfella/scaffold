@@ -13,4 +13,4 @@ include $(scaffold_dir)modules.mk
 include $(MAKECMDGOALS)
 
 # Print out what process_module_targets would have done.
-$(info $(call process_module_targets,$(MAKECMDGOALS)))
+$(info $(call process_module_targets,$(patsubst $(SCAFFOLD_SOURCE_DIR)%,%,$(MAKECMDGOALS))))

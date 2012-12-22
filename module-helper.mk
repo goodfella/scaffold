@@ -28,11 +28,20 @@ define full_source_path
 $(foreach path,$1,$(SCAFFOLD_SOURCE_DIR)$(module_dir)$(1))
 endef
 
+# Returns the precompiled module
+
+# 1 = Path to module.mk files relative to SCAFFOLD_SOURCE_DIR
+define relative_module_to_pmk
+$(addsuffix $(SCAFFOLD_PMK_SUFFIX),$(basename $(addprefix $(SCAFFOLD_BUILD_DIR),$(1))))
+endef
+
+
+
 # Returns precompiled module.mk paths
 
-# 1 = module.mk paths
+# 1 = List of module.mk full paths
 define precompiled_modules
-$(patsubst $(SCAFFOLD_SOURCE_DIR)%.mk,$(SCAFFOLD_BUILD_DIR)%.pmk,$1)
+$(patsubst $(SCAFFOLD_SOURCE_DIR)%.mk,$(SCAFFOLD_BUILD_DIR)%$(SCAFFOLD_PMK_SUFFIX),$1)
 endef
 
 

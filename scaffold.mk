@@ -69,19 +69,23 @@ $(call precompiled_modules,$1): $1
 
 endef
 
+# Normalize the scaffold module paths
+SCAFFOLD_MODULES := $(abspath $(SCAFFOLD_MODULES))
+
 # Generate the precompile module targets
 $(foreach mk,$(SCAFFOLD_MODULES),$(eval $(call build_precompiled_module,$(mk))))
-
-
-.SECONDEXPANSION:
 
 # Derive the .pmk paths from the module.mk paths
 SCAFFOLD_MODULES_PMK := $(call precompiled_modules,$(SCAFFOLD_MODULES))
 
+
+.SECONDEXPANSION:
+
 # force creation of a .pmk file for each .mk file
 include $(SCAFFOLD_MODULES_PMK)
 
-.PHONY: clean clean-all clean-pmk scaffold_programs scaffold_libraries all
+
+.PHONY: clean clean-all clean-pmk scaffold_programs scaffold_libraries all scaffold-process-modules
 clean-all: clean-pmk clean
 
 
@@ -95,5 +99,10 @@ all: scaffold_programs
 
 # Special target for testing
 scaffold-process-modules: ;
+
+# Outputs a processed module.mk to standard out
+%.mk.out: %.mk
+	cat $^
+	@$(MAKE) -s -f $(SCAFFOLD_DIR)print-module.mk $^
 
 endif

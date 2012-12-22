@@ -245,7 +245,7 @@ endef
 
 # sets up the neccessary targets for the objects defined in a
 # module.mk
-# 1 = module full path
+# 1 = module path relative to SCAFFOLD_SOURCE_DIR
 define process_module_targets
 
 .PHONY: $(module_dir)clean $(module_dir)clean-pmk
@@ -258,7 +258,7 @@ clean: $(module_dir)clean
 clean-pmk: $(module_dir)clean-pmk
 
 $(module_dir)clean-pmk:
-	rm -f $(call precompiled_modules,$1)
+	rm -f $(call relative_module_to_pmk,$1)
 
 # creates variables for source attributes
 $(foreach src,$(local_srcs),$(call src_vars,$(src),\

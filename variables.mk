@@ -5,6 +5,7 @@
 SCAFFOLD_OBJ_SUFFIX := o
 SCAFFOLD_FPIC ?= -fPIC
 SCAFFOLD_DEPENDS_SUFFIX := .d
+SCAFFOLD_PMK_SUFFIX := .pmk
 
 semi_colon := ;
 comma := ,
