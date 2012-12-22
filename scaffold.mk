@@ -46,6 +46,27 @@ $(SCAFFOLD_BUILD_DIR)Makefile:
 
 else
 
+ifneq ($(strip $(filter help,$(MAKECMDGOALS))),)
+
+# Help target is requsted, so print it
+
+.PHONY: help
+help:
+	@printf 'Generic targets:\n'
+	@printf '  all\t\t\t\t- Builds all targets\n'
+	@printf '  scaffold-programs\t\t- Builds all the programs\n'
+	@printf '  scaffold-libraries\t\t- Builds all the libraries\n'
+	@printf '\nCleaning targets:\n'
+	@printf '  clean\t\t\t\t- Cleans programs, libraries, and build artifacts\n'
+	@printf '  clean-pmk\t\t\t- Cleans the precompiled module files\n'
+	@printf '  clean-all\t\t\t- Runs clean and clean-pmk\n'
+	@printf '\nDebugging targets:\n'
+	@printf '  <module-dir>/module.mk.out\t- Outputs the processing of a module.mk file\n'
+	@printf '\t\t\t\t  <module-dir> is the path relative to\n'
+	@printf '\t\t\t\t  the source directory of the module file\n'
+else
+
+# normal target
 .DEFAULT_GOAL: all
 
 SCAFFOLD_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
@@ -109,5 +130,5 @@ scaffold-process-modules: ;
 %.mk.out: %.mk
 	cat $^
 	@$(MAKE) -s -f $(SCAFFOLD_DIR)print-module.mk $^
-
-endif
+endif # help target condition
+endif # out of source build condition
