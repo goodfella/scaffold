@@ -108,7 +108,8 @@ endef
 # 3 = lib dirs
 # 4 = link libraries
 define link_target
-$(call $(1),$$(strip $(2)\
+@mkdir -p $$(@D)
+	$(call $(1),$$(strip $(2)\
             $$(CFLAGS)\
             $$(TARGET_CFLAGS)\
             $$(TARGET_LIBDIRS)\
@@ -182,6 +183,7 @@ endef
 # 6 = extra gcc args
 define obj_rule
 $(call obj_file,$(1),$(2)) :
+	@mkdir -p $$(@D)
 	$(call gxx_noabbrv,$$(strip -M -MM -MD -MT $$@ \
                           $$(call filter_gcc_cppflags,$3 $$(CFLAGS) $$(SRC_CFLAGS) $$(PREREQ_CFLAGS) $$(SRC_VAR_CFLAGS)) \
                           $$(call prepend_gcc_cppflags,$(4)) \
@@ -243,7 +245,7 @@ endef
 
 # sets up the neccessary targets for the objects defined in a
 # module.mk
-# 1 = module path relative to the source directory
+# 1 = module full path
 define process_module_targets
 
 .PHONY: $(module_dir)clean $(module_dir)clean-pmk
@@ -256,7 +258,7 @@ clean: $(module_dir)clean
 clean-pmk: $(module_dir)clean-pmk
 
 $(module_dir)clean-pmk:
-	rm -f $(call precompiled_modules,$(patsubst $(SCAFFOLD_SOURCE_DIR)%,$(SCAFFOLD_BUILD_DIR)%,$1))
+	rm -f $(call precompiled_modules,$1)
 
 # creates variables for source attributes
 $(foreach src,$(local_srcs),$(call src_vars,$(src),\
@@ -281,8 +283,8 @@ $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
                                                        $1))
 
 # Include the makefile that defines any additional rules for this
-# module
--include $(module_dir)module-rules.mk
+# module if it exists
+$(if $(realpath $(dir $1)module-rules.mk),-include $(dir $1)module-rules.mk)
 endef
 
 

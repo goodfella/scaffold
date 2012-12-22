@@ -32,7 +32,7 @@ endef
 
 # 1 = module.mk paths
 define precompiled_modules
-$(patsubst %.mk,%.pmk,$1)
+$(patsubst $(SCAFFOLD_SOURCE_DIR)%.mk,$(SCAFFOLD_BUILD_DIR)%.pmk,$1)
 endef
 
 
