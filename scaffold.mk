@@ -79,6 +79,11 @@ $(foreach mk,$(SCAFFOLD_MODULES),$(eval $(call build_precompiled_module,$(mk))))
 SCAFFOLD_MODULES_PMK := $(call precompiled_modules,$(SCAFFOLD_MODULES))
 
 
+# Secondary expansion is used to expand variables that contain the
+# full paths to libraries built in this build.  Each library's path
+# variable is set when processing a .pmk file, so after all the pmk
+# files have been included, make will expand the library directory
+# variables referenced in library and program rules
 .SECONDEXPANSION:
 
 # force creation of a .pmk file for each .mk file
