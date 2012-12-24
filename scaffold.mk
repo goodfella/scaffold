@@ -82,22 +82,16 @@ include $(SCAFFOLD_DIR)modules.mk
 
 # Generates the rule to build a precompiled module
 
-# 1 = The path to the precomiled module's source
-define build_precompiled_module
-$(call precompiled_modules,$1): $1
-	@mkdir -p $$(@D)
-	$$(MAKE) -s -f $(SCAFFOLD_DIR)print-module.mk $$^ > $$@
-
-endef
-
 # Normalize the scaffold module paths
 SCAFFOLD_MODULES := $(abspath $(SCAFFOLD_MODULES))
 
-# Generate the precompile module targets
-$(foreach mk,$(SCAFFOLD_MODULES),$(eval $(call build_precompiled_module,$(mk))))
-
 # Derive the .pmk paths from the module.mk paths
 SCAFFOLD_MODULES_PMK := $(call precompiled_modules,$(SCAFFOLD_MODULES))
+
+# Pattern rule to build a .pmk file from a .mk file
+$(SCAFFOLD_BUILD_DIR)%.pmk : $(SCAFFOLD_SOURCE_DIR)%.mk
+	@mkdir -p $(@D)
+	$(MAKE) -s -f $(SCAFFOLD_DIR)/print-module.mk $^ > $@
 
 
 # Secondary expansion is used to expand variables that contain the
