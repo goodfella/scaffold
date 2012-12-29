@@ -101,9 +101,14 @@ $(SCAFFOLD_BUILD_DIR)%.pmk : $(SCAFFOLD_SOURCE_DIR)%.mk $$(@D)$(call dir_prereq)
 	$(MAKE) -s -f $(SCAFFOLD_DIR)print-module.mk $< > $@
 
 
+ifeq ($(filter %.mk.out,$(MAKECMDGOALS)),)
+
+# Only include the .pmk files if a .mk.out print out is not requested
+
 # force creation of a .pmk file for each .mk file
 include $(SCAFFOLD_MODULES_PMK)
 
+endif
 
 .PHONY: clean clean-all clean-pmk scaffold_programs scaffold_libraries all scaffold-process-modules
 clean-all: clean-pmk clean
