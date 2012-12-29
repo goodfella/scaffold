@@ -80,6 +80,7 @@ include $(SCAFFOLD_DIR)commands.mk
 include $(SCAFFOLD_DIR)module-helper.mk
 include $(SCAFFOLD_DIR)modules.mk
 
+
 # Generates the rule to build a precompiled module
 
 # Normalize the scaffold module paths
@@ -88,18 +89,17 @@ SCAFFOLD_MODULES := $(abspath $(SCAFFOLD_MODULES))
 # Derive the .pmk paths from the module.mk paths
 SCAFFOLD_MODULES_PMK := $(call precompiled_modules,$(SCAFFOLD_MODULES))
 
-# Pattern rule to build a .pmk file from a .mk file
-$(SCAFFOLD_BUILD_DIR)%.pmk : $(SCAFFOLD_SOURCE_DIR)%.mk
-	@mkdir -p $(@D)
-	$(MAKE) -s -f $(SCAFFOLD_DIR)/print-module.mk $^ > $@
-
-
 # Secondary expansion is used to expand variables that contain the
 # full paths to libraries built in this build.  Each library's path
 # variable is set when processing a .pmk file, so after all the pmk
 # files have been included, make will expand the library directory
 # variables referenced in library and program rules
 .SECONDEXPANSION:
+
+# Pattern rule to build a .pmk file from a .mk file
+$(SCAFFOLD_BUILD_DIR)%.pmk : $(SCAFFOLD_SOURCE_DIR)%.mk $$(@D)$(call dir_prereq)
+	$(MAKE) -s -f $(SCAFFOLD_DIR)print-module.mk $< > $@
+
 
 # force creation of a .pmk file for each .mk file
 include $(SCAFFOLD_MODULES_PMK)
@@ -124,5 +124,13 @@ scaffold-process-modules: ;
 %.mk.out: %.mk
 	cat $^
 	@$(MAKE) -s -f $(SCAFFOLD_DIR)print-module.mk $^
+
+# Creates a directory.  The file is marked as precious to prevent its
+# deletion
+.PRECIOUS: %.scaffold-dir
+%.scaffold-dir:
+	-mkdir -p $(@D)
+	touch $@
+
 endif # help target condition
 endif # out of source build condition

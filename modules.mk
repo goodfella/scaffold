@@ -49,7 +49,7 @@ endef
 # 2 = target object files
 # 3 = module path
 define target_prereqs
-$(call prereq_libraries,$1) $(2) $3 | $(call pre_rules,$1)
+$(call prereq_libraries,$1) $(2) $3 $(dollar)$(dollar)(@D)$(call dir_prereq) | $(call pre_rules,$1)
 endef
 
 
@@ -108,7 +108,6 @@ endef
 # 3 = lib dirs
 # 4 = link libraries
 define link_target
-@mkdir -p $$(@D)
 	$(call $(1),$$(strip $(2)\
             $$(CFLAGS)\
             $$(TARGET_CFLAGS)\
@@ -182,8 +181,7 @@ endef
 # 5 = incdirs
 # 6 = extra gcc args
 define obj_rule
-$(call obj_file,$(1),$(2)) :
-	@mkdir -p $$(@D)
+$(call obj_file,$(1),$(2)) : $(dollar)$(dollar)(@D)$(call dir_prereq)
 	$(call gxx_noabbrv,$$(strip -M -MM -MD -MT $$@ \
                           $$(call filter_gcc_cppflags,$3 $$(CFLAGS) $$(SRC_CFLAGS) $$(PREREQ_CFLAGS) $$(SRC_VAR_CFLAGS)) \
                           $$(call prepend_gcc_cppflags,$(4)) \

@@ -142,3 +142,9 @@ endef
 define add_lib_depend_files
 $(call add_depend_files,lib-$(1),$2)
 endef
+
+
+# Creates the directory prerequisite for an out of source build
+define dir_prereq
+$(if $(filter $(SCAFFOLD_SOURCE_DIR),$(SCAFFOLD_BUILD_DIR)),,/.scaffold-dir)
+endef
