@@ -40,6 +40,8 @@ $(SCAFFOLD_BUILD_DIR)Makefile:
 	@echo "export SCAFFOLD_BUILD_DIR := $(SCAFFOLD_BUILD_DIR)" >> $@
 	@echo "export SCAFFOLD_SOURCE_DIR := $(SCAFFOLD_SOURCE_DIR)" >> $@
 	@echo "all:" >> $@
+	@printf "\t@echo SCAFFOLD_BUILD_DIR = $(SCAFFOLD_BUILD_DIR)\n" >> $@
+	@printf "\t@echo SCAFFOLD_SOURCE_DIR = $(SCAFFOLD_SOURCE_DIR)\n" >> $@
 	@printf "\t\$$(MAKE) -C $(SCAFFOLD_SOURCE_DIR) all\n" >> $@
 	@echo ".DEFAULT:" >> $@
 	@printf "\t\$$(MAKE) --print-directory -C $(SCAFFOLD_SOURCE_DIR) \$$(MAKECMDGOALS)\n" >> $@
