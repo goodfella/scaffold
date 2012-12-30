@@ -83,8 +83,6 @@ include $(SCAFFOLD_DIR)module-helper.mk
 include $(SCAFFOLD_DIR)modules.mk
 
 
-# Generates the rule to build a precompiled module
-
 # Normalize the scaffold module paths
 SCAFFOLD_MODULES := $(abspath $(SCAFFOLD_MODULES))
 
