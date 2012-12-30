@@ -144,7 +144,12 @@ $(call add_depend_files,lib-$(1),$2)
 endef
 
 
-# Creates the directory prerequisite for an out of source build
-define dir_prereq
-$(if $(filter $(SCAFFOLD_SOURCE_DIR),$(SCAFFOLD_BUILD_DIR)),,/.scaffold-dir)
+# Generates the dir prerequisite for an implicit rule
+define implicit_dir_prereq
+$(if $(filter $(SCAFFOLD_SOURCE_DIR),$(SCAFFOLD_BUILD_DIR)),,$$(@D)/.scaffold-dir)
+endef
+
+# Generates teh dire prerequisite for a target
+define target_dir_prereq
+$(if $(filter $(SCAFFOLD_SOURCE_DIR),$(SCAFFOLD_BUILD_DIR)),,$(dollar)$(dollar)(@D)/.scaffold-dir)
 endef

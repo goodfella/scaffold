@@ -99,7 +99,7 @@ SCAFFOLD_MODULES_PMK := $(call precompiled_modules,$(SCAFFOLD_MODULES))
 .SECONDEXPANSION:
 
 # Pattern rule to build a .pmk file from a .mk file
-$(SCAFFOLD_BUILD_DIR)%.pmk : $(SCAFFOLD_SOURCE_DIR)%.mk $$(@D)$(call dir_prereq)
+$(SCAFFOLD_BUILD_DIR)%.pmk : $(SCAFFOLD_SOURCE_DIR)%.mk $(call implicit_dir_prereq)
 	$(MAKE) -s -f $(SCAFFOLD_DIR)print-module.mk $< > $@
 
 
