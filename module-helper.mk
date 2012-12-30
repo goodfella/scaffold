@@ -67,7 +67,7 @@ endef
 # 1 = list of source files
 # 2 = object file suffix
 define obj_files
-$(foreach src,$(1),$(call obj_file,$(src),$(2)))
+$(foreach src,$(strip $(1)),$(call obj_file,$(src),$(strip $(2))))
 endef
 
 

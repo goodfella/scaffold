@@ -172,68 +172,68 @@ $(call ln,$$(notdir $$<),$$(@))
 endef
 
 
-# creates the rule for an object file
+# Generates th recipe for an object file rule
 
-# 1 = source file path relative to the Makefile
-# 2 = object file suffix
-# 3 = cflags
-# 4 = cppflags
-# 5 = incdirs
-# 6 = extra gcc args
-define obj_rule
-$(call obj_file,$(1),$(2)) : $(call target_dir_prereq)
-	$(call gxx_noabbrv,$$(strip -M -MM -MD -MT $$@ \
-                          $$(call filter_gcc_cppflags,$3 $$(CFLAGS) $$(SRC_CFLAGS) $$(PREREQ_CFLAGS) $$(SRC_VAR_CFLAGS)) \
-                          $$(call prepend_gcc_cppflags,$(4)) \
-                          $$(call prepend_gcc_cppflags,$$(CPPFLAGS)) \
-                          $$(call prepend_gcc_cppflags,$$(SRC_CPPFLAGS)) \
-                          $$(PREREQ_CPPFLAGS) \
-                          $$(SRC_VAR_CPPFLAGS) \
-                          $$(call prepend_gcc_incdirs,$(5)) \
-                          $$(call prepend_gcc_incdirs,$$(INCDIRS)) \
-                          $$(call prepend_gcc_incdirs,$$(SRC_INCDIRS)) \
-                          $$(PREREQ_INCDIRS) \
-                          $$(SRC_VAR_INCDIRS)),, \
-                          $(addsuffix .d,$$@),$1)
+# 1 = cflags
+define obj_recipe
+$(call cxx_noabbrv,$(strip -M -MM -MD -MT $$@ \
+                   $(call filter_gcc_cppflags,$1 $$(CFLAGS) $(SRC_CFLAGS) $(PREREQ_CFLAGS) $(SRC_VAR_CFLAGS)) \
+                   $(call prepend_gcc_cppflags,$(CPPFLAGS)) \
+                   $(call prepend_gcc_cppflags,$(SRC_CPPFLAGS)) \
+                   $(PREREQ_CPPFLAGS) \
+                   $(SRC_VAR_CPPFLAGS) \
+                   $(call prepend_gcc_incdirs,$(INCDIRS)) \
+                   $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
+                   $(PREREQ_INCDIRS) \
+                   $(SRC_VAR_INCDIRS)),, \
+                   $(addsuffix $(SCAFFOLD_DEPENDS_SUFFIX),$@),$<)
 
-	$(call gxx,$$(strip $3 \
-                   $$(CFLAGS) \
-                   $$(SRC_CFLAGS) \
-                   $$(PREREQ_CFLAGS) \
-                   $$(SRC_VAR_CFLAGS) \
-                   $$(call prepend_gcc_cppflags,$(4)) \
-                   $$(call prepend_gcc_cppflags,$$(CPPFLAGS)) \
-                   $$(call prepend_gcc_cppflags,$$(SRC_CPPFLAGS)) \
-                   $$(PREREQ_CPPFLAGS) \
-                   $$(SRC_VAR_CPPFLAGS) \
-                   $$(call prepend_gcc_incdirs,$(5)) \
-                   $$(call prepend_gcc_incdirs,$$(INCDIRS)) \
-                   $$(call prepend_gcc_incdirs,$$(SRC_INCDIRS)) \
-                   $$(PREREQ_INCDIRS) \
-                   $$(SRC_VAR_INCDIRS) \
-                   $6 -c),,$$@,$1)
-
+	$(call gxx,$(strip $1 \
+                   $(CFLAGS) \
+                   $(SRC_CFLAGS) \
+                   $(PREREQ_CFLAGS) \
+                   $(SRC_VAR_CFLAGS) \
+                   $(call prepend_gcc_cppflags,$(CPPFLAGS)) \
+                   $(call prepend_gcc_cppflags,$(SRC_CPPFLAGS)) \
+                   $(PREREQ_CPPFLAGS) \
+                   $(SRC_VAR_CPPFLAGS) \
+                   $(call prepend_gcc_incdirs,$(INCDIRS)) \
+                   $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
+                   $(PREREQ_INCDIRS) \
+                   $(SRC_VAR_INCDIRS) \
+                   -c),,$@,$<)
 endef
 
-# creates the object file rule for a C++ source file
 
-# 1 = source file path
-# 2 = object file suffix
-# 3 = extra gcc args
-define cxx_obj_rule
-$(call obj_rule,$1,$2,$$(CXXFLAGS) $$(SRC_CXXFLAGS),,,$3)
+# Generates the recipe for a for a C++ object file rule
+define cxx_obj_recipe
+$(call obj_recipe,$(CXXFLAGS) $(SRC_CXXFLAGS))
 endef
+
+
+# Cancel the predefined implicit rules for C++ object files
+%.o: %.cc
+%.o: %.cpp
+
+.SECONDEXPANSION:
+# Pattern rules for C++ object files
+$(SCAFFOLD_BUILD_DIR)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR)%.cc $(call implicit_dir_prereq)
+	$(call cxx_obj_recipe)
+
+$(SCAFFOLD_BUILD_DIR)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR)%.cpp $(call implicit_dir_prereq)
+	$(call cxx_obj_recipe)
 
 
 # creates the target specific variables for all targets
 
 # 1 = target name
 # 2 = target path
+# 3 = Extra prereq cflags
 define create_target_vars
 
 $(2): TARGET_CFLAGS := $(call cflags,$1)
 $(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call srcs_incdirs,$1))
-$(2): PREREQ_CFLAGS := $(call srcs_cflags,$1)
+$(2): PREREQ_CFLAGS := $(call srcs_cflags,$1) $3
 $(2): PREREQ_CPPFLAGS := $(call prepend_gcc_cppflags,$(call srcs_cppflags,$1))
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
 $(2): TARGET_SHLIBS := $(call shlibs,$1)
@@ -268,7 +268,7 @@ $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
                                                            $(SCAFFOLD_BUILD_DIR)$(module_dir),\
                                                            $(call relpath,$(call srcs,$(shlib))),\
                                                            link_cxx_shlib,\
-                                                           cxx_obj_rule,\
+                                                           $(SCAFFOLD_CXX_OBJ_SUFFIX),\
                                                            1,\
                                                            $1))
 
@@ -277,7 +277,7 @@ $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
                                                        $(call full_build_path,$(prog)),\
                                                        $(call relpath,$(call srcs,$(prog))),\
-                                                       $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(SCAFFOLD_OBJ_SUFFIX)),\
+                                                       $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(SCAFFOLD_CXX_OBJ_SUFFIX)),\
                                                        $1))
 
 # Include the makefile that defines any additional rules for this
@@ -292,15 +292,14 @@ endef
 # 2 = library directory
 # 3 = full pathed sources
 # 4 = library link command
-# 5 = object file command
+# 5 = object file suffix
 # 6 = build shlib flag
 # 7 = module path
 define process_library
-
 $(1)_dir := $2
 
 ifneq ($6,)
-$(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$(SCAFFOLD_OBJ_SUFFIX)),$4,$5,$7)
+$(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$5),$4,$7)
 endif
 endef
 
@@ -312,15 +311,14 @@ endef
 # 3 = full pathed sources
 # 4 = full pathed object files
 # 5 = shared library linker command
-# 6 = object file command
-# 7 = module path
+# 6 = module path
 define create_shlib_rule
 
 # check if srcs variable is set
 $(if $(3),,$(error shared library $(1) is missing a $(1)_srcs variable))
 
 $(call add_library,$2)
-$(call create_target_vars,$(1),$2)
+$(call create_target_vars,$(1),$2,$(SCAFFOLD_FPIC))
 $(call add_lib_clean_rule,$1)
 $(call add_lib_clean_files,$1,$4)
 $(call add_lib_depend_files,$1,$(call depend_files,$(4)))
@@ -347,7 +345,7 @@ $(2): $(call soname,$(1),$(2))
 $(call soname,$(1),$(2)): $(call realname,$(1),$(2))
 	$(call create_shlib_symlink)
 
-$(call realname,$(1),$(2)): $(call target_prereqs,$1,$4,$7)
+$(call realname,$(1),$(2)): $(call target_prereqs,$1,$4,$6)
 	$(call $5,$(call soname,$(1),$(notdir $(2))))
 
 
@@ -360,7 +358,7 @@ $(call add_lib_clean_files,$1,$(call soname,$(1),$(2)))
 $(2): $(call soname,$(1),$(2))
 	$(call create_shlib_symlink)
 
-$(call soname,$(1),$(2)): $(call target_prereqs,$1,$4,$7)
+$(call soname,$(1),$(2)): $(call target_prereqs,$1,$4,$6)
 	$(call $5,$(call soname,$(1),$(notdir $(2))))
 
 endif
@@ -370,14 +368,10 @@ else
 
 $(call add_lib_clean_files,$1,$2)
 
-$(2): $(call target_prereqs,$1,$4,$7)
+$(2): $(call target_prereqs,$1,$4,$6)
 	$(call $5,)
 
 endif
-
-
-# generate the rules for the object files
-$(foreach src,$(3),$(call $6,$(src),$(SCAFFOLD_OBJ_SUFFIX),$(SCAFFOLD_FPIC)))
 
 endef
 
@@ -408,9 +402,6 @@ $(call add_clean_files,$1,$2)
 
 $(2): $(call target_prereqs,$1,$4,$5)
 	$(call link_cxx_program)
-
-# generate the rules for each object file
-$(foreach src,$(3),$(call cxx_obj_rule,$(src),$(SCAFFOLD_OBJ_SUFFIX),))
 endef
 
 
