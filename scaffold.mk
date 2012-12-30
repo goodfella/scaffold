@@ -136,8 +136,8 @@ scaffold-process-modules: ;
 # deletion
 .PRECIOUS: %.scaffold-dir
 %.scaffold-dir:
-	-mkdir -p $(@D)
-	touch $@
+	@-mkdir -p $(@D)
+	@touch $@
 
 endif # help target condition
 endif # out of source build condition
