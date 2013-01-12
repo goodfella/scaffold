@@ -275,7 +275,7 @@ $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
 
 # create the rules for the C++ programs defined in the module
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
-                                                       $(call full_build_path,$(prog)),\
+                                                       $(call module_build_path,$(prog)),\
                                                        $(call relpath,$(call srcs,$(prog))),\
                                                        $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(SCAFFOLD_CXX_OBJ_SUFFIX)),\
                                                        $1))

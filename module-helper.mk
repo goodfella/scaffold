@@ -2,7 +2,8 @@
 
 # functions used in all modules.mk's
 
-# The path to the module file relative to SCAFFOLD_SOURCE_DIR
+# The path to the module file relative to SCAFFOLD_SOURCE_DIR.  All
+# references to this variable must be immediately expanded.
 module_dir = $(patsubst $(SCAFFOLD_SOURCE_DIR)%,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
 # path relative to the top level Makefile
@@ -13,18 +14,20 @@ $(addprefix $(module_dir),$1)
 endef
 
 
-# Full path taking into account the scaffold build directory
+# Full path to the module's build directory.  All references to this
+# variable must be immediately expanded.
 
 # 1 = Relative path to the component
-define full_build_path
+define module_build_path
 $(foreach path,$1,$(SCAFFOLD_BUILD_DIR)$(module_dir)$(1))
 endef
 
 
-# Full source path taking into account the scaffold source directory
+# Full path to the module's source directory.  All references to this
+# variable must be immediately expanded.
 
 # 1 = Relative path to component
-define full_source_path
+define module_source_path
 $(foreach path,$1,$(SCAFFOLD_SOURCE_DIR)$(module_dir)$(1))
 endef
 
