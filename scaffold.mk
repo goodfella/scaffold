@@ -37,6 +37,7 @@ ifeq ($(strip $(realpath $(SCAFFOLD_BUILD_DIR)Makefile)),)
 # Target to build the out of source Makefile.  This is the default
 # goal, which will generate the Makefile
 $(SCAFFOLD_BUILD_DIR)Makefile:
+	@echo "Building out of source build Makefile ..."
 	@echo "export SCAFFOLD_BUILD_DIR := $(SCAFFOLD_BUILD_DIR)" >> $@
 	@echo "export SCAFFOLD_SOURCE_DIR := $(SCAFFOLD_SOURCE_DIR)" >> $@
 	@echo "all:" >> $@
