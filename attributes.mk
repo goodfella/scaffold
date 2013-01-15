@@ -4,21 +4,31 @@
 # are what the build system acts on.  The object hierarchy is as
 # follows (super objects are at the far left):
 
-# compiled
-#	targets
-#		shared libraries
-#		programs
-
-#	sources
+# |-- objects:
+# |    \
+# |     |-- attribute: cflags
+# |     |-- object: targets (programs, libraries)
+# |     |    \
+# |     |     |-- attribute: set_incdirs
+# |     |     |-- attribute: libdirs
+# |     |     |-- attribute: shlibs
+# |     |     |-- attribute: srcs
+# |     |     |-- attribute: srcs_cflags
+# |     |     |-- attribute: srcs_incidrs
+# |     |     |-- attribute: pre_rules
+# |     |     |-- object: libraries (shared, static)
+# |     |          \
+# |     |           |-- attribute: version
+# |     |           |-- attribute: minor
+# |     |           |-- attribute: release
+# |     |
+# |     |-- object: sources
+# |     |    \
+# |     |     |-- attribute: incdirs
 
 # Attributes are inherited, so the valid attributes for a shared
-# library are the target attributes and the compiled object
-# attributes.  You specify attributes on an object in a module.mk file
-# by creating a variable whose name is the object name as given in the
-# module.mk file followed by a underscore '_' and the attribute name.
-# The value of the variable is the value of the attribute for that
-# object.
-
+# library are the target attributes and the top level attributes for
+# objects.
 
 # Unless otherwise noted, the first argument to the function is the
 # name of the object
