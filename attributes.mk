@@ -42,11 +42,6 @@ define cflags
 $(call attribute,$1,$0)
 endef
 
-# flags for preprocessor
-define cppflags
-$(call attribute,$1,$0)
-endef
-
 # include directories
 define incdirs
 $(call attribute,$1,$0)
@@ -70,11 +65,6 @@ endef
 # compiler flags to apply to all sources specified in the srcs
 # attribute
 define srcs_cflags
-$(call attribute,$1,$0)
-endef
-
-# cpp flags to apply to all source specified in the srcs attribute
-define srcs_cppflags
 $(call attribute,$1,$0)
 endef
 
