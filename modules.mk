@@ -212,6 +212,7 @@ $(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call srcs_incdirs,$1))
 $(2): PREREQ_CFLAGS := $(call srcs_cflags,$1) $3
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
 $(2): TARGET_SHLIBS := $(call shlibs,$1)
+INCDIRS += $(call set_incdirs,$1)
 
 endef
 

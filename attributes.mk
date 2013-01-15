@@ -4,28 +4,23 @@
 # are what the build system acts on.  The object hierarchy is as
 # follows (super objects are at the far left):
 
-#compiled
+# compiled
 #	targets
 #		shared libraries
 #		programs
 
 #	sources
 
-#not compiled
-
-#	files
-
-
-# attributes are inherited, so the valid attributes for a shared
+# Attributes are inherited, so the valid attributes for a shared
 # library are the target attributes and the compiled object
-# attributes.  you specify attributes on an object in a module.mk file
+# attributes.  You specify attributes on an object in a module.mk file
 # by creating a variable whose name is the object name as given in the
 # module.mk file followed by a underscore '_' and the attribute name.
 # The value of the variable is the value of the attribute for that
-# object
+# object.
 
 
-# unless otherwise noted, the first argument to the function is the
+# Unless otherwise noted, the first argument to the function is the
 # name of the object
 
 
@@ -42,8 +37,14 @@ define cflags
 $(call attribute,$1,$0)
 endef
 
-# include directories
+# Include directories.  These are the include directories to use for
+# compiling this object.
 define incdirs
+$(call attribute,$1,$0)
+endef
+
+# The values of this attribute get copied to the INCDIRS variable.
+define set_incdirs
 $(call attribute,$1,$0)
 endef
 
