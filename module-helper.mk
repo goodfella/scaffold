@@ -6,10 +6,10 @@
 # references to this variable must be immediately expanded.
 module_dir = $(patsubst $(SCAFFOLD_SOURCE_DIR)%,%,$(dir $(lastword $(MAKEFILE_LIST))))
 
-# path relative to the top level Makefile
-# usage
+# module path relative to the SCAFFOLD_SOURCE_DIR usage
+
 # 1 = filenames
-define relpath
+define module_source_relpath
 $(addprefix $(module_dir),$1)
 endef
 
@@ -18,7 +18,7 @@ endef
 # variable must be immediately expanded.
 
 # 1 = Relative path to the component
-define module_build_path
+define module_build_fullpath
 $(foreach path,$1,$(SCAFFOLD_BUILD_DIR)$(module_dir)$(1))
 endef
 
@@ -27,9 +27,10 @@ endef
 # variable must be immediately expanded.
 
 # 1 = Relative path to component
-define module_source_path
+define module_source_fullpath
 $(foreach path,$1,$(SCAFFOLD_SOURCE_DIR)$(module_dir)$(1))
 endef
+
 
 # Returns the precompiled module
 

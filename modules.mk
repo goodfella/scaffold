@@ -236,13 +236,13 @@ $(module_dir)clean-pmk:
 
 # creates variables for source attributes
 $(foreach src,$(local_srcs),$(call src_vars,$(src),\
-                                            $(call obj_file,$(call relpath,$(src)),$(SCAFFOLD_OBJ_SUFFIX))))
+                                            $(call obj_file,$(call module_source_relpath,$(src)),$(SCAFFOLD_OBJ_SUFFIX))))
 
 
 # create the rules for the C++ shared libraries
 $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
                                                            $(SCAFFOLD_BUILD_DIR)$(module_dir),\
-                                                           $(call relpath,$(call srcs,$(shlib))),\
+                                                           $(call module_source_relpath,$(call srcs,$(shlib))),\
                                                            link_cxx_shlib,\
                                                            $(SCAFFOLD_CXX_OBJ_SUFFIX),\
                                                            1,\
@@ -251,9 +251,9 @@ $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
 
 # create the rules for the C++ programs defined in the module
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
-                                                       $(call module_build_path,$(prog)),\
-                                                       $(call relpath,$(call srcs,$(prog))),\
-                                                       $(call obj_files,$(call relpath,$(call srcs,$(prog))),$(SCAFFOLD_CXX_OBJ_SUFFIX)),\
+                                                       $(call module_build_fullpath,$(prog)),\
+                                                       $(call module_source_relpath,$(call srcs,$(prog))),\
+                                                       $(call obj_files,$(call module_source_relpath,$(call srcs,$(prog))),$(SCAFFOLD_CXX_OBJ_SUFFIX)),\
                                                        $1))
 
 # Include the makefile that defines any additional rules for this
