@@ -30,6 +30,21 @@ export SCAFFOLD_BUILD_DIR ?= $(CURDIR)/
 # Directory where the source code lives
 export SCAFFOLD_SOURCE_DIR ?= $(dir $(realpath $(filter %Makefile,$(MAKEFILE_LIST))))
 
+ifeq ($(SCAFFOLD_SOURCE_DIR),$(SCAFFOLD_BUILD_DIR))
+# The source directory and the build directory are the same
+
+# When doing in source builds, use relative paths for components.
+# This allows the source directory to be moved around
+export SCAFFOLD_BUILD_DIR_PREFIX :=
+
+else
+
+# When doing out of source builds, use the full path for components
+export SCAFFOLD_BUILD_DIR_PREFIX := $(SCAFFOLD_BUILD_DIR)
+export SCAFFOLD_SOURCE_DIR_PREFIX := $(SCAFFOLD_SOURCE_DIR)
+
+endif
+
 ifeq ($(strip $(realpath $(SCAFFOLD_BUILD_DIR)Makefile)),)
 
 # The out of source Makefile does not exist, so make it
@@ -98,7 +113,7 @@ SCAFFOLD_MODULES_PMK := $(call precompiled_modules,$(SCAFFOLD_MODULES))
 .SECONDEXPANSION:
 
 # Pattern rule to build a .pmk file from a .mk file
-$(SCAFFOLD_BUILD_DIR)%.pmk : $(SCAFFOLD_SOURCE_DIR)%.mk $(call implicit_dir_prereq)
+$(SCAFFOLD_BUILD_DIR_PREFIX)%.pmk : $(SCAFFOLD_SOURCE_DIR_PREFIX)%.mk $(call implicit_dir_prereq)
 	$(MAKE) -s -f $(SCAFFOLD_DIR)print-module.mk $< > $@
 
 

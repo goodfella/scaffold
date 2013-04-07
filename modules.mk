@@ -49,7 +49,7 @@ endef
 # 2 = target object files
 # 3 = module path
 define target_prereqs
-$(call prereq_libraries,$1) $(2) $(call module_source_fullpath,$(call objs,$1)) $3 $(call target_dir_prereq) | $(call pre_rules,$1)
+$(call prereq_libraries,$1) $(2) $(call module_relpath,$(call objs,$1)) $3 $(call target_dir_prereq) | $(call pre_rules,$1)
 endef
 
 
@@ -193,10 +193,10 @@ endef
 
 .SECONDEXPANSION:
 # Pattern rules for C++ object files
-$(SCAFFOLD_BUILD_DIR)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR)%.cc $(call implicit_dir_prereq)
+$(SCAFFOLD_BUILD_DIR_PREFIX)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR_PREFIX)%.cc $(call implicit_dir_prereq)
 	$(call cxx_obj_recipe)
 
-$(SCAFFOLD_BUILD_DIR)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR)%.cpp $(call implicit_dir_prereq)
+$(SCAFFOLD_BUILD_DIR_PREFIX)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR_PREFIX)%.cpp $(call implicit_dir_prereq)
 	$(call cxx_obj_recipe)
 
 
@@ -213,7 +213,7 @@ $(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call srcs_incdirs,$1))
 $(2): PREREQ_CFLAGS := $(call srcs_cflags,$1) $4
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
 $(2): TARGET_SHLIBS := $(call shlibs,$1)
-$(2): TARGET_OBJECTS := $3 $(call module_source_fullpath,$(call objs,$1))
+$(2): TARGET_OBJECTS := $3 $(call module_relpath,$(call objs,$1))
 INCDIRS += $(call set_incdirs,$1)
 
 endef
@@ -243,7 +243,7 @@ $(foreach src,$(local_srcs),$(call src_vars,$(src),\
 
 # create the rules for the C++ shared libraries
 $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
-                                                           $(SCAFFOLD_BUILD_DIR)$(module_dir),\
+                                                           $(SCAFFOLD_BUILD_DIR_PREFIX)$(module_dir),\
                                                            $(call module_relpath,$(call srcs,$(shlib))),\
                                                            link_cxx_shlib,\
                                                            $(SCAFFOLD_CXX_OBJ_SUFFIX),\

@@ -19,7 +19,7 @@ endef
 
 # 1 = Relative path to the component
 define module_build_fullpath
-$(foreach path,$1,$(SCAFFOLD_BUILD_DIR)$(module_dir)$(path))
+$(foreach path,$1,$(SCAFFOLD_BUILD_DIR_PREFIX)$(module_dir)$(path))
 endef
 
 
@@ -36,7 +36,7 @@ endef
 
 # 1 = Path to module.mk files relative to SCAFFOLD_SOURCE_DIR
 define relative_module_to_pmk
-$(addsuffix $(SCAFFOLD_PMK_SUFFIX),$(basename $(addprefix $(SCAFFOLD_BUILD_DIR),$(1))))
+$(addsuffix $(SCAFFOLD_PMK_SUFFIX),$(basename $(addprefix $(SCAFFOLD_BUILD_DIR_PREFIX),$(1))))
 endef
 
 
@@ -45,7 +45,7 @@ endef
 
 # 1 = List of module.mk paths.  The paths can be relative, or full.
 define precompiled_modules
-$(addsuffix $(SCAFFOLD_PMK_SUFFIX),$(addprefix $(SCAFFOLD_BUILD_DIR),$(patsubst $(SCAFFOLD_SOURCE_DIR)%.mk,%,$1)))
+$(addsuffix $(SCAFFOLD_PMK_SUFFIX),$(addprefix $(SCAFFOLD_BUILD_DIR_PREFIX),$(patsubst $(SCAFFOLD_SOURCE_DIR)%.mk,%,$1)))
 endef
 
 
@@ -61,7 +61,7 @@ endef
 # 1 = source file
 # 2 = object file suffix
 define obj_file
-$(addprefix $(SCAFFOLD_BUILD_DIR),$(addsuffix .$(2),$(basename $(1))))
+$(addprefix $(SCAFFOLD_BUILD_DIR_PREFIX),$(addsuffix .$(2),$(basename $(1))))
 endef
 
 
