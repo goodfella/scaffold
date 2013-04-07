@@ -4,7 +4,7 @@
 # are what the build system acts on.  The object hierarchy is as
 # follows (super objects are at the far left):
 
-# |-- objects:
+# |-- compiled objects:
 # |    \
 # |     |-- attribute: cflags
 # |     |-- object: targets (programs, libraries)
