@@ -153,7 +153,7 @@ define implicit_dir_prereq
 $(if $(filter $(SCAFFOLD_SOURCE_DIR),$(SCAFFOLD_BUILD_DIR)),,$$(@D)/.scaffold-dir)
 endef
 
-# Generates teh dire prerequisite for a target
+# Generates the dir prerequisite for a target
 define target_dir_prereq
 $(if $(filter $(SCAFFOLD_SOURCE_DIR),$(SCAFFOLD_BUILD_DIR)),,$(dollar)$(dollar)(@D)/.scaffold-dir)
 endef
