@@ -49,7 +49,7 @@ endef
 # 2 = target object files
 # 3 = module path
 define target_prereqs
-$(call prereq_libraries,$1) $(2) $3 $(call target_dir_prereq) | $(call pre_rules,$1)
+$(call prereq_libraries,$1) $(2) $(call module_source_fullpath,$(call objs,$1)) $3 $(call target_dir_prereq) | $(call pre_rules,$1)
 endef
 
 
@@ -213,7 +213,7 @@ $(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call srcs_incdirs,$1))
 $(2): PREREQ_CFLAGS := $(call srcs_cflags,$1) $4
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
 $(2): TARGET_SHLIBS := $(call shlibs,$1)
-$(2): TARGET_OBJECTS := $3
+$(2): TARGET_OBJECTS := $3 $(call module_source_fullpath,$(call objs,$1))
 INCDIRS += $(call set_incdirs,$1)
 
 endef

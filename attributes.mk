@@ -15,6 +15,7 @@
 # |     |     |-- attribute: srcs
 # |     |     |-- attribute: srcs_cflags
 # |     |     |-- attribute: srcs_incidrs
+# |     |     |-- attribute: objs
 # |     |     |-- attribute: pre_rules
 # |     |     |-- object: libraries (shared, static)
 # |     |          \
@@ -70,6 +71,11 @@ endef
 
 # source files for the target
 define srcs
+$(call attribute,$1,$0)
+endef
+
+# precompiled object files for the target
+define objs
 $(call attribute,$1,$0)
 endef
 
