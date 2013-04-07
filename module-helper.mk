@@ -19,7 +19,7 @@ endef
 
 # 1 = Relative path to the component
 define module_build_fullpath
-$(foreach path,$1,$(SCAFFOLD_BUILD_DIR)$(module_dir)$(1))
+$(foreach path,$1,$(SCAFFOLD_BUILD_DIR)$(module_dir)$(path))
 endef
 
 
@@ -28,7 +28,7 @@ endef
 
 # 1 = Relative path to component
 define module_source_fullpath
-$(foreach path,$1,$(SCAFFOLD_SOURCE_DIR)$(module_dir)$(1))
+$(foreach path,$1,$(SCAFFOLD_SOURCE_DIR)$(module_dir)$(path))
 endef
 
 
