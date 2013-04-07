@@ -238,29 +238,29 @@ $(module_dir)clean-pmk:
 
 # creates variables for source attributes
 $(foreach src,$(local_srcs),$(call src_vars,$(src),\
-                                            $(call obj_file,$(call module_source_relpath,$(src)),$(SCAFFOLD_OBJ_SUFFIX))))
+                                            $(call obj_file,$(call module_relpath,$(src)),$(SCAFFOLD_OBJ_SUFFIX))))
 
 
 # create the rules for the C++ shared libraries
 $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
                                                            $(SCAFFOLD_BUILD_DIR)$(module_dir),\
-                                                           $(call module_source_relpath,$(call srcs,$(shlib))),\
+                                                           $(call module_relpath,$(call srcs,$(shlib))),\
                                                            link_cxx_shlib,\
                                                            $(SCAFFOLD_CXX_OBJ_SUFFIX),\
                                                            1,\
-                                                           $1 $(call module_source_relpath,$(call module_rules,$1))))
+                                                           $1 $(call module_relpath,$(call module_rules,$1))))
 
 
 # create the rules for the C++ programs defined in the module
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
                                                        $(call module_build_fullpath,$(prog)),\
-                                                       $(call module_source_relpath,$(call srcs,$(prog))),\
-                                                       $(call obj_files,$(call module_source_relpath,$(call srcs,$(prog))),$(SCAFFOLD_CXX_OBJ_SUFFIX)),\
-                                                       $1 $(call module_source_relpath,$(call module_rules,$1))))
+                                                       $(call module_relpath,$(call srcs,$(prog))),\
+                                                       $(call obj_files,$(call module_relpath,$(call srcs,$(prog))),$(SCAFFOLD_CXX_OBJ_SUFFIX)),\
+                                                       $1 $(call module_relpath,$(call module_rules,$1))))
 
 # Include the makefile that defines any additional rules for this
 # module if it exists
-$(if $(call module_rules,$1),include $(call module_source_relpath,$(call module_rules,$1)))
+$(if $(call module_rules,$1),include $(call module_relpath,$(call module_rules,$1)))
 endef
 
 

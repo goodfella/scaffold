@@ -9,7 +9,7 @@ module_dir = $(patsubst $(SCAFFOLD_SOURCE_DIR)%,%,$(dir $(lastword $(MAKEFILE_LI
 # module path relative to the SCAFFOLD_SOURCE_DIR usage
 
 # 1 = filenames
-define module_source_relpath
+define module_relpath
 $(addprefix $(module_dir),$1)
 endef
 
