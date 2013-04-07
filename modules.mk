@@ -248,7 +248,7 @@ $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
                                                            link_cxx_shlib,\
                                                            $(SCAFFOLD_CXX_OBJ_SUFFIX),\
                                                            1,\
-                                                           $1))
+                                                           $1 $(call module_source_relpath,$(call module_rules,$1))))
 
 
 # create the rules for the C++ programs defined in the module
@@ -256,11 +256,11 @@ $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
                                                        $(call module_build_fullpath,$(prog)),\
                                                        $(call module_source_relpath,$(call srcs,$(prog))),\
                                                        $(call obj_files,$(call module_source_relpath,$(call srcs,$(prog))),$(SCAFFOLD_CXX_OBJ_SUFFIX)),\
-                                                       $1))
+                                                       $1 $(call module_source_relpath,$(call module_rules,$1))))
 
 # Include the makefile that defines any additional rules for this
 # module if it exists
-$(if $(realpath $(dir $1)module-rules.mk),-include $(dir $1)module-rules.mk)
+$(if $(call module_rules,$1),include $(call module_source_relpath,$(call module_rules,$1)))
 endef
 
 

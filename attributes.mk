@@ -4,6 +4,10 @@
 # are what the build system acts on.  The object hierarchy is as
 # follows (super objects are at the far left):
 
+# |-- module.mk files:
+# |   \
+# |    |-- attribute: module_rules
+# |
 # |-- compiled objects:
 # |    \
 # |     |-- attribute: cflags
@@ -39,6 +43,12 @@
 # 2 = name of attribute
 define attribute
 $($(1)_$(2))
+endef
+
+# Makefile where other rules are specified.  This Makefile is included
+# by the build system
+define module_rules
+$(call attribute,$1,$0)
 endef
 
 # compiled object attributes
