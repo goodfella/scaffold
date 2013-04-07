@@ -102,7 +102,7 @@ define link_target
             $$(call prepend_gcc_libdirs,$$(call library_info,$$(TARGET_SHLIBS),dir))),\
             $$(strip $(4)\
             $$(call prepend_gcc_link_shlibs,$$(TARGET_SHLIBS))),\
-            $$@,$$(filter %.$(SCAFFOLD_OBJ_SUFFIX),$$^))
+            $$@,$$(TARGET_OBJECTS))
 endef
 
 
@@ -204,14 +204,16 @@ $(SCAFFOLD_BUILD_DIR)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR)%.cpp $
 
 # 1 = target name
 # 2 = target path
+# 3 = object files
 # 3 = Extra prereq cflags
 define create_target_vars
 
 $(2): TARGET_CFLAGS := $(call cflags,$1)
 $(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call srcs_incdirs,$1))
-$(2): PREREQ_CFLAGS := $(call srcs_cflags,$1) $3
+$(2): PREREQ_CFLAGS := $(call srcs_cflags,$1) $4
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
 $(2): TARGET_SHLIBS := $(call shlibs,$1)
+$(2): TARGET_OBJECTS := $3
 INCDIRS += $(call set_incdirs,$1)
 
 endef
@@ -294,7 +296,7 @@ define create_shlib_rule
 $(if $(3),,$(error shared library $(1) is missing a $(1)_srcs variable))
 
 $(call add_library,$2)
-$(call create_target_vars,$(1),$2,$(SCAFFOLD_FPIC))
+$(call create_target_vars,$(1),$2,$4,$(SCAFFOLD_FPIC))
 $(call add_lib_clean_rule,$1)
 $(call add_lib_clean_files,$1,$4)
 $(call add_lib_depend_files,$1,$(call depend_files,$(4)))
@@ -363,7 +365,7 @@ define cxx_prog_rule
 # checks to make sure a srcs variable is declared
 $(if $(3),,$(error program $(1) is missing a $(1)_srcs variable))
 
-$(call create_target_vars,$(1),$(2))
+$(call create_target_vars,$(1),$(2),$4)
 
 $(call add_program,$(2))
 $(call add_clean_rule,$1)
