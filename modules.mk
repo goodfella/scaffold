@@ -159,16 +159,18 @@ endef
 # Generates th recipe for an object file rule
 
 # 1 = cflags
+# 2 = no abbrv gcc command
+# 3 = gcc command
 define obj_recipe
-$(call cxx_noabbrv,$(strip -M -MM -MD -MT $$@ \
-                   $1 $$(CFLAGS) $(SRC_CFLAGS) $(PREREQ_CFLAGS) $(SRC_VAR_CFLAGS) \
+$(call $(2),$(strip -M -MM -MD -MT $@ \
+                   $1 $(CFLAGS) $(SRC_CFLAGS) $(PREREQ_CFLAGS) $(SRC_VAR_CFLAGS) \
                    $(call prepend_gcc_incdirs,$(INCDIRS)) \
                    $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
                    $(PREREQ_INCDIRS) \
                    $(SRC_VAR_INCDIRS)),, \
                    $(addsuffix $(SCAFFOLD_DEPENDS_SUFFIX),$@),$<)
 
-	$(call gxx,$(strip $1 \
+	$(call $(3),$(strip $1 \
                    $(CFLAGS) \
                    $(SRC_CFLAGS) \
                    $(PREREQ_CFLAGS) \
@@ -183,7 +185,7 @@ endef
 
 # Generates the recipe for a for a C++ object file rule
 define cxx_obj_recipe
-$(call obj_recipe,$(CXXFLAGS) $(SRC_CXXFLAGS))
+$(call obj_recipe,$(CXXFLAGS) $(SRC_CXXFLAGS),gxx_noabbrv,gxx)
 endef
 
 
