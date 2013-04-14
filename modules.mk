@@ -183,23 +183,21 @@ $(call $(2),$(strip -M -MM -MD -MT $@ \
 endef
 
 
-# Generates the recipe for a for a C++ object file rule
-define cxx_obj_recipe
-$(call obj_recipe,$(CXXFLAGS) $(SRC_CXXFLAGS),gxx_noabbrv,gxx)
+# Generates the implicit rule for a C++ object
+
+# 1 = C++ suffix
+define cxx_obj_rule
+# cancel the builtin implicit rule
+%.o: %.$(1)
+$(SCAFFOLD_BUILD_DIR_PREFIX)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR_PREFIX)%.$(1) $(call implicit_dir_prereq)
+	$$(call obj_recipe,$$(CXXFLAGS) $$(SRC_CXXFLAGS),gxx_noabbrv,gxx)
+
 endef
 
-
-# Cancel the predefined implicit rules for C++ object files
-%.o: %.cc
-%.o: %.cpp
-
 .SECONDEXPANSION:
-# Pattern rules for C++ object files
-$(SCAFFOLD_BUILD_DIR_PREFIX)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR_PREFIX)%.cc $(call implicit_dir_prereq)
-	$(call cxx_obj_recipe)
 
-$(SCAFFOLD_BUILD_DIR_PREFIX)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR_PREFIX)%.cpp $(call implicit_dir_prereq)
-	$(call cxx_obj_recipe)
+# Pattern rules for C++ object files
+$(foreach suffix,$(SCAFFOLD_CXX_SUFFIXES),$(eval $(call cxx_obj_rule,$(suffix))))
 
 
 # creates the target specific variables for all targets
