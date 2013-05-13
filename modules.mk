@@ -167,8 +167,8 @@ $(call $(2),$(strip -M -MM -MD -MT $@ \
                    $(call prepend_gcc_incdirs,$(INCDIRS)) \
                    $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
                    $(call prepend_gcc_incdirs,$(SCAFFOLD_INCDIRS)) \
-                   $(PREREQ_INCDIRS) \
-                   $(SRC_VAR_INCDIRS)),, \
+                   $(call prepend_gcc_incdirs,$(PREREQ_INCDIRS)) \
+                   $(call prepend_gcc_incdirs,$(SRC_VAR_INCDIRS))),, \
                    $(addsuffix $(SCAFFOLD_DEPENDS_SUFFIX),$@),$<)
 
 	$(call $(3),$(strip $1 \
@@ -179,8 +179,8 @@ $(call $(2),$(strip -M -MM -MD -MT $@ \
                    $(call prepend_gcc_incdirs,$(INCDIRS)) \
                    $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
                    $(call prepend_gcc_incdirs,$(SCAFFOLD_INCDIRS)) \
-                   $(PREREQ_INCDIRS) \
-                   $(SRC_VAR_INCDIRS) \
+                   $(call prepend_gcc_incdirs,$(PREREQ_INCDIRS)) \
+                   $(call prepend_gcc_incdirs,$(SRC_VAR_INCDIRS)) \
                    -c),,$@,$<)
 endef
 
@@ -211,7 +211,7 @@ $(foreach suffix,$(SCAFFOLD_CXX_SUFFIXES),$(eval $(call cxx_obj_rule,$(suffix)))
 define create_target_vars
 
 $(2): TARGET_CFLAGS := $(call cflags,$1)
-$(2): PREREQ_INCDIRS := $(call prepend_gcc_incdirs,$(call srcs_incdirs,$1))
+$(2): PREREQ_INCDIRS := $(call srcs_incdirs,$1)
 $(2): PREREQ_CFLAGS := $(call srcs_cflags,$1) $4
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
 $(2): TARGET_SHLIBS := $(call shlibs,$1)
@@ -393,5 +393,5 @@ define src_vars
 
 # create a target specific variable for each source attribute
 $(2): SRC_VAR_CFLAGS := $(call cflags,$1)
-$(2): SRC_VAR_INCDIRS := $(call prepend_gcc_incdirs,$(call incdirs,$1))
+$(2): SRC_VAR_INCDIRS := $(call incdirs,$1)
 endef
