@@ -95,10 +95,9 @@ define link_target
 	$(call $(1),$$(strip $(2)\
             $$(CFLAGS)\
             $$(TARGET_CFLAGS)\
-            $$(TARGET_LIBDIRS)\
+            $$(call prepend_gcc_libdirs,$$(TARGET_LIBDIRS))\
             $(3)\
-            $(call prepend_gcc_libdirs,$(LIBDIRS))\
-            $(call prepend_gcc_rpath_link,$(LIBDIRS))\
+            $$(call prepend_gcc_libdirs,$$(LIBDIRS))\
             $$(call prepend_gcc_libdirs,$$(call library_info,$$(TARGET_SHLIBS),dir))),\
             $$(strip $(4)\
             $$(call prepend_gcc_link_shlibs,$$(TARGET_SHLIBS))),\
@@ -213,7 +212,7 @@ define create_target_vars
 $(2): TARGET_CFLAGS := $(call cflags,$1)
 $(2): PREREQ_INCDIRS := $(call srcs_incdirs,$1)
 $(2): PREREQ_CFLAGS := $(call srcs_cflags,$1) $4
-$(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
+$(2): TARGET_LIBDIRS := $(call libdirs,$1)
 $(2): TARGET_SHLIBS := $(call shlibs,$1)
 $(2): TARGET_OBJECTS := $3 $(call module_relpath,$(call objs,$1))
 SCAFFOLD_INCDIRS += $(call set_incdirs,$1)
