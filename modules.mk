@@ -166,6 +166,7 @@ $(call $(2),$(strip -M -MM -MD -MT $@ \
                    $1 $(CFLAGS) $(SRC_CFLAGS) $(PREREQ_CFLAGS) $(SRC_VAR_CFLAGS) \
                    $(call prepend_gcc_incdirs,$(INCDIRS)) \
                    $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
+                   $(call prepend_gcc_incdirs,$(SCAFFOLD_INCDIRS)) \
                    $(PREREQ_INCDIRS) \
                    $(SRC_VAR_INCDIRS)),, \
                    $(addsuffix $(SCAFFOLD_DEPENDS_SUFFIX),$@),$<)
@@ -177,6 +178,7 @@ $(call $(2),$(strip -M -MM -MD -MT $@ \
                    $(SRC_VAR_CFLAGS) \
                    $(call prepend_gcc_incdirs,$(INCDIRS)) \
                    $(call prepend_gcc_incdirs,$(SRC_INCDIRS)) \
+                   $(call prepend_gcc_incdirs,$(SCAFFOLD_INCDIRS)) \
                    $(PREREQ_INCDIRS) \
                    $(SRC_VAR_INCDIRS) \
                    -c),,$@,$<)
@@ -214,7 +216,7 @@ $(2): PREREQ_CFLAGS := $(call srcs_cflags,$1) $4
 $(2): TARGET_LIBDIRS := $(call prepend_gcc_libdirs,$(call libdirs,$1))
 $(2): TARGET_SHLIBS := $(call shlibs,$1)
 $(2): TARGET_OBJECTS := $3 $(call module_relpath,$(call objs,$1))
-INCDIRS += $(call set_incdirs,$1)
+SCAFFOLD_INCDIRS += $(call set_incdirs,$1)
 
 endef
 
