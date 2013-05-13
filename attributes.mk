@@ -8,7 +8,7 @@
 # |   \
 # |    |-- attribute: module_rules
 # |
-# |-- compiled objects:
+# |-- buildable objects:
 # |    \
 # |     |-- attribute: cflags
 # |     |-- object: targets (programs, libraries)
