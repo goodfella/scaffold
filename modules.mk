@@ -28,6 +28,10 @@ endef
 
 # generates the prerequisite libraries for a given target
 
+# Since $(info) is used to print the pmk, the $(dollar) variable is
+# used to escape the $$ necessary for secondary expansion; otherwise,
+# $(info) will prevent secondary expansion by removing one of the $
+
 # 1 = target name
 define prereq_libraries
 $(foreach prereq_lib,$(call shlibs,$1),$(dollar)$$($(prereq_lib)_shlib_target))
@@ -86,6 +90,8 @@ endef
 
 
 # compiler command for a linked target
+
+# $$ is used to prevent $(info) from expanding variables prematurely
 
 # 1 = compiler name
 # 2 = compiler flags
@@ -155,7 +161,7 @@ $(call ln,$$(notdir $$<),$$(@))
 endef
 
 
-# Generates th recipe for an object file rule
+# Generates the recipe for an object file rule
 
 # 1 = cflags
 # 2 = no abbrv gcc command
@@ -308,13 +314,13 @@ $(call add_lib_depend_files,$1,$(call depend_files,$(4)))
 $(1)_shlib_target := $(2)
 
 
-# library rules
+# library rules based on version information provided
 
 ifneq ($(call version,$(1)),)
+ifneq ($(call minor,$(1)),)
 
 # we have a version number and a minor number, so the linker name depends on the
 # soname and the soname depends on the real name
-ifneq ($(call minor,$(1)),)
 
 $(call add_lib_clean_files,$1,$(call soname,$(1),$(2)) $(call realname,$(1),$(2)))
 
@@ -327,10 +333,10 @@ $(call soname,$(1),$(2)): $(call realname,$(1),$(2))
 $(call realname,$(1),$(2)): $(call target_prereqs,$1,$4,$6)
 	$(call $5,$(call soname,$(1),$(notdir $(2))))
 
+else
 
 # we have a version number without a minor number, so the linker name
-# depends on a soname
-else
+# depends on the soname only
 
 $(call add_lib_clean_files,$1,$(call soname,$(1),$(2)))
 
@@ -340,17 +346,17 @@ $(2): $(call soname,$(1),$(2))
 $(call soname,$(1),$(2)): $(call target_prereqs,$1,$4,$6)
 	$(call $5,$(call soname,$(1),$(notdir $(2))))
 
-endif
+endif # end of ifneq ($(call minor,$(1)),)
+else
 
 # no version just build linker name
-else
 
 $(call add_lib_clean_files,$1,$2)
 
 $(2): $(call target_prereqs,$1,$4,$6)
 	$(call $5,)
 
-endif
+endif # end of ifneq ($(call version,$(1)),)
 
 endef
 
