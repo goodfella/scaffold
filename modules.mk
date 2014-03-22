@@ -196,7 +196,7 @@ endef
 define cxx_obj_rule
 # cancel the builtin implicit rule
 %.o: %.$(1)
-$(SCAFFOLD_BUILD_DIR_PREFIX)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR_PREFIX)%.$(1) $(call implicit_dir_prereq)
+$(SCAFFOLD_BUILD_DIR_PREFIX)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR_PREFIX)%.$(1) $$(call implicit_dir_prereq)
 	$$(call obj_recipe,$$(CXXFLAGS) $$(SRC_CXXFLAGS),gxx_noabbrv,gxx)
 
 endef
