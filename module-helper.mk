@@ -51,7 +51,7 @@ endef
 
 # Returns the depend files
 
-# 1 = list of object files
+# 1 = list of source files
 define depend_files
 $(addsuffix $(SCAFFOLD_DEPENDS_SUFFIX),$1)
 endef
@@ -61,15 +61,17 @@ endef
 # 1 = source file
 # 2 = object file suffix
 define obj_file
-$(addprefix $(SCAFFOLD_BUILD_DIR_PREFIX),$(addsuffix .$(2),$(basename $(1))))
+$(addprefix $(SCAFFOLD_BUILD_DIR_PREFIX),$(addsuffix .$(2),$(1)))
 endef
 
 
-# returns a list of object files given a list of full pathed source
-# files
+# returns a list of object files given a list of module relative
+# source file paths
 
-# 1 = list of source files
-# 2 = object file suffix
+# 1 = List of source files.  The source file paths must be relative to
+#     their top level module.mk directory.
+#
+# 2 = Object file suffix
 define obj_files
 $(foreach src,$(strip $(1)),$(call obj_file,$(src),$(strip $(2))))
 endef

@@ -190,13 +190,11 @@ $(call $(2),$(strip -M -MM -MD -MT $@ \
 endef
 
 
-# Generates the implicit rule for a C++ object
+# Generates the implicit rule for a C++ object file
 
-# 1 = C++ suffix
+# 1 = Source suffix
 define cxx_obj_rule
-# cancel the builtin implicit rule
-%.o: %.$(1)
-$(SCAFFOLD_BUILD_DIR_PREFIX)%.$(SCAFFOLD_CXX_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR_PREFIX)%.$(1) $$(call implicit_dir_prereq)
+$(SCAFFOLD_BUILD_DIR_PREFIX)%.$(1).$(SCAFFOLD_OBJ_SUFFIX): $(SCAFFOLD_SOURCE_DIR_PREFIX)%.$(1) $$(call implicit_dir_prereq)
 	$$(call obj_recipe,$$(CXXFLAGS) $$(SRC_CXXFLAGS),gxx_noabbrv,gxx)
 
 endef
@@ -253,7 +251,7 @@ $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
                                                            $(SCAFFOLD_BUILD_DIR_PREFIX)$(module_dir),\
                                                            $(call module_relpath,$(call srcs,$(shlib))),\
                                                            link_cxx_shlib,\
-                                                           $(SCAFFOLD_CXX_OBJ_SUFFIX),\
+                                                           $(SCAFFOLD_OBJ_SUFFIX),\
                                                            1,\
                                                            $1 $(call module_relpath,$(call module_rules,$1))))
 
@@ -262,7 +260,7 @@ $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
 $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
                                                        $(call module_build_fullpath,$(prog)),\
                                                        $(call module_relpath,$(call srcs,$(prog))),\
-                                                       $(call obj_files,$(call module_relpath,$(call srcs,$(prog))),$(SCAFFOLD_CXX_OBJ_SUFFIX)),\
+                                                       $(call obj_files,$(call module_relpath,$(call srcs,$(prog))),$(SCAFFOLD_OBJ_SUFFIX)),\
                                                        $1 $(call module_relpath,$(call module_rules,$1))))
 
 # Include the makefile that defines any additional rules for this
