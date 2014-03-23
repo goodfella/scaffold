@@ -174,7 +174,7 @@ $(call $(2),$(strip -M -MM -MD -MT $@ \
                    $(call prepend_gcc_incdirs,$(SCAFFOLD_INCDIRS)) \
                    $(call prepend_gcc_incdirs,$(PREREQ_INCDIRS)) \
                    $(call prepend_gcc_incdirs,$(SRC_VAR_INCDIRS))),, \
-                   $(addsuffix $(SCAFFOLD_DEPENDS_SUFFIX),$@),$<)
+                   $(call depend_files,$@),$<)
 
 	$(call $(3),$(strip $1 \
                    $(CFLAGS) \
