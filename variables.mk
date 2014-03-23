@@ -2,8 +2,10 @@
 
 # global variables used by the build system
 
-# simply expanded so it can be appended to with attributes
+# SCAFFOLD_INCDIRS is simply expanded so it can be appended to with
+# attributes that also need to be simply expanded
 SCAFFOLD_INCDIRS :=
+
 SCAFFOLD_OBJ_SUFFIX := o
 SCAFFOLD_CXX_OBJ_SUFFIX := cxx.o
 SCAFFOLD_FPIC ?= -fPIC
