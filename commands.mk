@@ -54,8 +54,8 @@ $(if $($(abbrv)_echo),$($(abbrv)_echo) $(a_$1) \\t $2)
 endef
 
 
-# gcc to compile programs.  Note, the trailing end line is required,
-# but right now I don't know why.
+# Compile with g++.  Note, the trailing end line is required, but
+# right now I don't know why.
 
 # usage
 # 1 = list of arguments
@@ -69,8 +69,8 @@ $(call abbrv_cmd,$0,$(3))
 endef
 
 
-# gcc to compile programs but don't print the command when
-# abbreviations are used
+# Compile with g++ but don't print the command when abbreviations are
+# used
 
 # usage
 # 1 = list of arguments
