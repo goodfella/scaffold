@@ -21,6 +21,7 @@
 # |     |     |-- attribute: srcs_incidrs
 # |     |     |-- attribute: objs
 # |     |     |-- attribute: pre_rules
+# |     |     |-- attribute: aliases
 # |     |     |-- object: libraries (shared, static)
 # |     |          \
 # |     |           |-- attribute: version
@@ -126,5 +127,10 @@ endef
 # each pre_rule must be unique among targets defined in the module.mk
 # files
 define pre_rules
+$(call attribute,$1,$0)
+endef
+
+# Phony targets that list the object as a prerequisite
+define aliases
 $(call attribute,$1,$0)
 endef

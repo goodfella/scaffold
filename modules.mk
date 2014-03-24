@@ -253,7 +253,8 @@ $(foreach shlib,$(local_cxx_shlibs),$(call process_library,$(shlib),\
                                                            link_cxx_shlib,\
                                                            $(SCAFFOLD_OBJ_SUFFIX),\
                                                            1,\
-                                                           $1 $(call module_relpath,$(call module_rules,$1))))
+                                                           $1 $(call module_relpath,$(call module_rules,$1)),\
+                                                           $(call aliases,$(shlib))))
 
 
 # create the rules for the C++ programs defined in the module
@@ -261,7 +262,8 @@ $(foreach prog,$(local_cxx_progs),$(call cxx_prog_rule,$(prog),\
                                                        $(call module_build_fullpath,$(prog)),\
                                                        $(call module_relpath,$(call srcs,$(prog))),\
                                                        $(call obj_files,$(call module_relpath,$(call srcs,$(prog))),$(SCAFFOLD_OBJ_SUFFIX)),\
-                                                       $1 $(call module_relpath,$(call module_rules,$1))))
+                                                       $1 $(call module_relpath,$(call module_rules,$1)),\
+                                                       $(call aliases,$(prog))))
 
 # Include the makefile that defines any additional rules for this
 # module if it exists
@@ -278,11 +280,12 @@ endef
 # 5 = object file suffix
 # 6 = build shlib flag
 # 7 = module path
+# 8 = aliases
 define process_library
 $(1)_dir := $2
 
 ifneq ($6,)
-$(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$5),$4,$7)
+$(call create_shlib_rule,$1,$(call linker_name,$(2)$(1)),$3,$(call obj_files,$3,$5),$4,$7,$8)
 endif
 endef
 
@@ -295,6 +298,7 @@ endef
 # 4 = full pathed object files
 # 5 = shared library linker command
 # 6 = module path
+# 7 = aliases
 define create_shlib_rule
 
 # check if srcs variable is set
@@ -311,6 +315,9 @@ $(call add_lib_depend_files,$1,$(call depend_files,$(4)))
 # require it
 $(1)_shlib_target := $(2)
 
+# Add alias targets
+.PHONY: $(7)
+$(7): $(2)
 
 # library rules based on version information provided
 
@@ -365,6 +372,7 @@ endef
 # 3 = full pathed program sources
 # 4 = full pathed program object files
 # 5 = module path
+# 6 = aliases
 define cxx_prog_rule
 
 # checks to make sure a srcs variable is declared
@@ -377,6 +385,10 @@ $(call add_clean_rule,$1)
 $(call add_clean_files,$1,$4)
 $(call add_depend_files,$1,$(call depend_files,$4))
 $(call add_clean_files,$1,$2)
+
+# Add alias targets
+.PHONY: $(6)
+$(6): $(2)
 
 
 # rule to create the program.  The dependencies are the object files
